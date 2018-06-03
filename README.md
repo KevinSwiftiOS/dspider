@@ -1,2 +1,2 @@
 # dspider
-一款基于django的以selenium为引擎的爬虫框架
+一款基于Django以Selenium为爬虫引擎的爬虫框架
