@@ -5,7 +5,7 @@ from spider.driver.base.tabsetup import TabSetup
 from spider.driver.base.page import Page
 from spider.driver.base.listcssselector import ListCssSelector
 from spider.driver.base.mongodb import Mongodb
-from .traveldriver import TravelDriver
+from spider.driver.travel.core.traveldriver import TravelDriver
 import time
 from pyquery import PyQuery
 import json
@@ -14,7 +14,7 @@ import re
 fl_shop1 = Fieldlist(
     Field(fieldname=FieldName.SHOP_IMG, css_selector='div > div.h_info_pic > a > img', attr='src'),
     Field(fieldname=FieldName.SHOP_NAME, css_selector='div > div.h_info_text > div.h_info_base > p.h_info_b1 > a', attr='title'),
-    Field(fieldname=FieldName.SHOP_NAME, css_selector='div > div.h_info_text > div.h_info_base > p.h_info_b1 > a', attr='href'),
+    Field(fieldname=FieldName.SHOP_URL, css_selector='div > div.h_info_text > div.h_info_base > p.h_info_b1 > a', attr='href'),
     Field(fieldname=FieldName.SHOP_RATE, css_selector='div > div.h_info_text > div.h_info_base > p.h_info_b1 > b', attr='class', regex=r'[^\d]*'),
     Field(fieldname=FieldName.SHOP_GRADE, css_selector='div > div.h_info_text > div.h_info_comt', regex=r'^([\d.]*).*$', repl=r'\1'),
     Field(fieldname=FieldName.SHOP_COMMENT_NUM, css_selector='div > div.h_info_text > div.h_info_comt', regex=r'^[\d.]*[^\d]*([\d]*)[^\d]*$', repl=r'\1'),

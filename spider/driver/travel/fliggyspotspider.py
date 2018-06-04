@@ -1,6 +1,6 @@
 # -*- coding:utf-8 -*-
 
-from .traveldriver import *
+from spider.driver.travel.core.traveldriver import *
 from .params import *
 from .fields import *
 

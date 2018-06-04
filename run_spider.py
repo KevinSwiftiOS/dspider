@@ -1,6 +1,6 @@
 # -*- coding:utf-8 -*-
 from spider.driver.generic.consts import GenericSpiderName
-from spider.driver.travel.traveldriver import TravelSpiderName
+from spider.driver.travel.core.traveldriver import TravelSpiderName
 import sys
 
 if __name__ == '__main__':
@@ -72,6 +72,14 @@ if __name__ == '__main__':
     elif sys.argv[2]+sys.argv[4] == TravelSpiderName.TUNIU_HOTEL:
         from spider.driver.travel.tuniuhotelspider import TuniuHotelSpider
         spider = TuniuHotelSpider(isheadless=False,ismobile=False,isvirtualdisplay=False,
+                                    spider_id=sys.argv[1],
+                                    data_website=sys.argv[2],
+                                    data_region=sys.argv[3],
+                                    data_source=sys.argv[4])
+        spider.run_spider()
+    elif sys.argv[2]+sys.argv[4] == TravelSpiderName.DIANPING_HOTEL:
+        from spider.driver.travel.dianpinghotelspider import DianpingHotelSpider
+        spider = DianpingHotelSpider(isheadless=False,ismobile=False,isvirtualdisplay=False,
                                     spider_id=sys.argv[1],
                                     data_website=sys.argv[2],
                                     data_region=sys.argv[3],

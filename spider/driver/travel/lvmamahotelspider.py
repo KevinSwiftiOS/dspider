@@ -1,6 +1,6 @@
 # -*- coding:utf-8 -*-
 
-from .traveldriver import *
+from spider.driver.travel.core.traveldriver import *
 from spider.driver.base.field import Fieldlist,Field,FieldName
 from spider.driver.base.listcssselector import ListCssSelector
 from spider.driver.base.tabsetup import TabSetup

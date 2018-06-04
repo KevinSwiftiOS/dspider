@@ -1,5 +1,5 @@
 # -*- coding:utf-8 -*-
-from .traveldriver import TravelDriver
+from spider.driver.travel.core.traveldriver import TravelDriver
 from .consts import *
 from .fields import *
 import time

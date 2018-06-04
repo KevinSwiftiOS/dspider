@@ -7,7 +7,7 @@ import json
 from .util import *
 from .params import *
 from spider.driver.base.field import *
-from spider.driver.travel.traveldriver import TravelDriver
+from spider.driver.travel.core.traveldriver import TravelDriver
 from spider.driver.base.mongodb import Mongodb
 
 def Index(request):

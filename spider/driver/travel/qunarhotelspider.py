@@ -5,7 +5,7 @@ from spider.driver.base.tabsetup import TabSetup
 from spider.driver.base.page import Page
 from spider.driver.base.listcssselector import ListCssSelector
 from spider.driver.base.mongodb import Mongodb
-from .traveldriver import TravelDriver
+from spider.driver.travel.core.traveldriver import TravelDriver
 import time
 from pyquery import PyQuery
 import json

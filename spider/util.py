@@ -3,7 +3,7 @@ import os,signal
 from .params import *
 from .models import Project
 from spider.driver.base.field import FieldName
-from spider.driver.travel.traveldriver import WEBSITE_NAME_LIST,DataSourceName,TravelDriver
+from spider.driver.travel.core.traveldriver import WEBSITE_NAME_LIST,DataSourceName,TravelDriver
 from spider.driver.base.mongodb import Mongodb
 
 shops_collection = Mongodb(host=TravelDriver.host, port=TravelDriver.port, db=TravelDriver.db,

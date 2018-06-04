@@ -4,7 +4,7 @@
 
 from django.db import migrations
 
-from spider.driver.travel.traveldriver import WEBSITE_NAME_LIST,DATASOURCE_NAME_LIST
+from spider.driver.travel.core.traveldriver import WEBSITE_NAME_LIST,DATASOURCE_NAME_LIST
 
 def InitDataWebsite(apps, schema_editor):
     print('InitDataWebsite')

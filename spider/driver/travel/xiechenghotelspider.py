@@ -1,6 +1,6 @@
 # -*- coding:utf-8 -*-
 
-from .traveldriver import TravelDriver
+from spider.driver.travel.core.traveldriver import TravelDriver
 from spider.driver.base.page import Page
 from spider.driver.base.field import Fieldlist,Field,FieldName
 from spider.driver.base.tabsetup import TabSetup
@@ -10,7 +10,6 @@ import re
 import time
 import json
 from pyquery import PyQuery
-import sys
 
 fl_shop1 = Fieldlist(
     Field(fieldname=FieldName.SHOP_NAME,css_selector='li.hotel_item_name > h2 > a',regex=r'^[\d]*(.*)$',repl=r'\1'),
