@@ -47,6 +47,7 @@ class FieldName(object):
     SHOP_FACILITIES = 'shop_facilities'  # 店铺设施
     SHOP_RANK = 'shop_rank'#店铺排名
     SHOP_TRAFFIC = 'shop_traffic'#位置交通
+    SHOP_TAG = 'shop_tag'#店铺标签
 
     COMMENT_USER_NAME = 'comment_user_name'#评论者的名字
     COMMENT_USER_ID = 'comment_user_id'#评论者的编号
@@ -97,6 +98,7 @@ FIELD_NAME_TYPE = {
     FieldName.SHOP_FACILITIES : FieldType.STR,
     FieldName.SHOP_RANK : FieldType.STR,
     FieldName.SHOP_TRAFFIC : FieldType.STR,
+    FieldName.SHOP_TAG : FieldType.STR,
 
     FieldName.COMMENT_USER_NAME : FieldType.KEY_STR,
     FieldName.COMMENT_USER_ID : FieldType.STR,
@@ -149,6 +151,7 @@ FIELD_NAME_ZH = {
     FieldName.SHOP_FACILITIES : '店铺设施',
     FieldName.SHOP_RANK : '店铺排名',
     FieldName.SHOP_TRAFFIC : '位置交通',
+    FieldName.SHOP_TAG : '店铺标签',
 
     FieldName.COMMENT_USER_NAME : '用户名称',
     FieldName.COMMENT_USER_ID : '用户编号',
