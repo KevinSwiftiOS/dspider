@@ -2,29 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="756ee09f-4103-4020-adb7-47fc47666c73" name="Default" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/dspider.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/db.sqlite3" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dspider/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/dspider/settings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/run_spider.py" beforeDir="false" afterPath="$PROJECT_DIR$/run_spider.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dspider.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dspider.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/spider/driver/base/driver.py" beforeDir="false" afterPath="$PROJECT_DIR$/spider/driver/base/driver.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/spider/driver/travel/dianpinghotel.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/spider/driver/travel/dianpingspot.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/spider/driver/travel/elonghotel.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/spider/driver/travel/elonghotelspider.py" beforeDir="false" afterPath="$PROJECT_DIR$/spider/driver/travel/elonghotelspider.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/spider/driver/travel/fliggyhotelspider.py" beforeDir="false" afterPath="$PROJECT_DIR$/spider/driver/travel/fliggyhotelspider.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/spider/driver/travel/fliggyspot.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/spider/driver/travel/lvmamahotelspider.py" beforeDir="false" afterPath="$PROJECT_DIR$/spider/driver/travel/lvmamahotelspider.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/spider/driver/travel/lvmamaspot.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/spider/driver/travel/qunarhotelspider.py" beforeDir="false" afterPath="$PROJECT_DIR$/spider/driver/travel/qunarhotelspider.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/spider/driver/travel/tuniuspot.py" beforeDir="false" afterPath="$PROJECT_DIR$/spider/driver/travel/tuniuhotelspider.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/spider/driver/travel/xiechenghotelspider.py" beforeDir="false" afterPath="$PROJECT_DIR$/spider/driver/travel/xiechenghotelspider.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/mongodb_remove.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/mongodb_remove.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/test.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/test_regex.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_regex.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/test_regex2.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_regex2.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/spider/driver/travel/tuniuhotelspider.py" beforeDir="false" afterPath="$PROJECT_DIR$/spider/driver/travel/tuniuhotelspider.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -34,73 +16,21 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="CoverageDataManager">
-    <SUITE FILE_PATH="coverage/dspider$test_regex2.coverage" NAME="test_regex2 Coverage Results" MODIFIED="1528020269347" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests" />
-    <SUITE FILE_PATH="coverage/dspider$test_firefox.coverage" NAME="test_firefox Coverage Results" MODIFIED="1527040255377" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests" />
-    <SUITE FILE_PATH="coverage/dspider$test2.coverage" NAME="test2 Coverage Results" MODIFIED="1527843137856" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests" />
     <SUITE FILE_PATH="coverage/dspider$test_refresh.coverage" NAME="test_refresh Coverage Results" MODIFIED="1526976598414" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests" />
-    <SUITE FILE_PATH="coverage/dspider$test_shop_name.coverage" NAME="test_shop_name Coverage Results" MODIFIED="1527813056922" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests" />
-    <SUITE FILE_PATH="coverage/dspider$test_regex.coverage" NAME="test_regex Coverage Results" MODIFIED="1528044936361" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests" />
+    <SUITE FILE_PATH="coverage/dspider$test2.coverage" NAME="test2 Coverage Results" MODIFIED="1527843137856" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests" />
     <SUITE FILE_PATH="coverage/dspider$Unittests_in_test_refresh_py.coverage" NAME="Unittests in test_refresh.py Coverage Results" MODIFIED="1526958948105" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests" />
+    <SUITE FILE_PATH="coverage/dspider$test_regex2.coverage" NAME="test_regex2 Coverage Results" MODIFIED="1528020269347" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests" />
     <SUITE FILE_PATH="coverage/dspider$test.coverage" NAME="test Coverage Results" MODIFIED="1527839699416" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/spider/driver/generic" />
+    <SUITE FILE_PATH="coverage/dspider$test_regex.coverage" NAME="test_regex Coverage Results" MODIFIED="1528044936361" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests" />
     <SUITE FILE_PATH="coverage/dspider$mongodb_remove.coverage" NAME="mongodb_remove Coverage Results" MODIFIED="1528045071321" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests" />
+    <SUITE FILE_PATH="coverage/dspider$test_firefox.coverage" NAME="test_firefox Coverage Results" MODIFIED="1527040255377" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests" />
+    <SUITE FILE_PATH="coverage/dspider$test_shop_name.coverage" NAME="test_shop_name Coverage Results" MODIFIED="1527813056922" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests" />
   </component>
   <component name="DjangoConsoleOptions" custom-start-script="import sys; print('Python %s on %s' % (sys.version, sys.platform))&#10;import django; print('Django %s' % django.get_version())&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;if 'setup' in dir(django): django.setup()&#10;import django_manage_shell; django_manage_shell.run(PROJECT_ROOT)">
     <option name="myCustomStartScript" value="import sys; print('Python %s on %s' % (sys.version, sys.platform))&#10;import django; print('Django %s' % django.get_version())&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;if 'setup' in dir(django): django.setup()&#10;import django_manage_shell; django_manage_shell.run(PROJECT_ROOT)" />
   </component>
   <component name="FileEditorManager">
-    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="test_regex.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/tests/test_regex.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="85">
-              <caret line="7" selection-start-line="7" selection-end-line="12" selection-end-column="99" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="test.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/tests/test.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="17">
-              <caret line="1" selection-start-line="1" selection-end-line="3" selection-end-column="13" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="tuniuhotelspider.py" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/spider/driver/travel/tuniuhotelspider.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="77">
-              <caret line="75" column="137" selection-start-line="75" selection-start-column="137" selection-end-line="75" selection-end-column="137" />
-              <folding>
-                <element signature="e#24#86#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="mongodb_remove.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/tests/mongodb_remove.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="119">
-              <caret line="11" column="44" selection-start-line="11" selection-start-column="44" selection-end-line="11" selection-end-column="44" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="driver.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/spider/driver/base/driver.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-46">
-              <caret line="1374" column="8" selection-start-line="1374" selection-start-column="8" selection-end-line="1374" selection-end-column="8" />
-              <folding>
-                <element signature="e#23#53#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-    </leaf>
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300" />
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -126,6 +56,7 @@
       <find>普</find>
       <find>834</find>
       <find>1</find>
+      <find>fast_get</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -157,10 +88,10 @@
         <option value="$PROJECT_DIR$/spider/views.py" />
         <option value="$PROJECT_DIR$/tests/test.py" />
         <option value="$PROJECT_DIR$/spider/driver/travel/elonghotelspider.py" />
-        <option value="$PROJECT_DIR$/spider/driver/base/driver.py" />
         <option value="$PROJECT_DIR$/run_spider.py" />
         <option value="$PROJECT_DIR$/tests/test_regex.py" />
         <option value="$PROJECT_DIR$/tests/mongodb_remove.py" />
+        <option value="$PROJECT_DIR$/spider/driver/base/driver.py" />
         <option value="$PROJECT_DIR$/spider/driver/travel/tuniuhotelspider.py" />
       </list>
     </option>
@@ -192,7 +123,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -234,15 +164,16 @@
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="DefaultHtmlFileTemplate" value="HTML File" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$USER_HOME$/dspider_env" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
-    <property name="settings.editor.selected.configurable" value="editor.preferences.fonts.default" />
+    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
@@ -436,17 +367,16 @@
     </history-entry>
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="27" width="1366" height="708" extended-state="6" />
-    <editor active="true" />
+    <frame x="51" y="27" width="1629" height="990" extended-state="6" />
     <layout>
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Event Log" order="7" side_tool="true" />
       <window_info anchor="bottom" id="Database Changes" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Version Control" order="7" />
       <window_info anchor="bottom" id="Python Console" order="7" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.34641638" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.34641638" />
       <window_info anchor="bottom" id="Terminal" order="7" />
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.21083455" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.21055862" />
       <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
       <window_info anchor="right" id="Database" order="3" />
       <window_info anchor="right" id="SciView" order="3" />
@@ -614,9 +544,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="637">
           <caret line="113" column="21" lean-forward="true" selection-start-line="113" selection-start-column="21" selection-end-line="113" selection-end-column="21" />
-          <folding>
-            <element signature="e#24#86#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -676,9 +603,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="169">
           <caret line="82" column="44" selection-start-line="82" selection-start-column="44" selection-end-line="83" selection-end-column="73" />
-          <folding>
-            <element signature="e#24#86#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -686,19 +610,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="170">
           <caret line="119" column="115" selection-start-line="119" selection-start-column="115" selection-end-line="119" selection-end-column="146" />
-          <folding>
-            <element signature="e#24#86#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/spider/driver/base/driver.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-46">
-          <caret line="1374" column="8" selection-start-line="1374" selection-start-column="8" selection-end-line="1374" selection-end-column="8" />
-          <folding>
-            <element signature="e#23#53#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -712,7 +623,7 @@
     <entry file="file://$PROJECT_DIR$/tests/test_regex.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="85">
-          <caret line="7" selection-start-line="7" selection-end-line="12" selection-end-column="99" />
+          <caret line="7" selection-start-line="7" selection-end-line="7" />
         </state>
       </provider>
     </entry>
@@ -725,10 +636,20 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/spider/driver/travel/tuniuhotelspider.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="77">
-          <caret line="75" column="137" selection-start-line="75" selection-start-column="137" selection-end-line="75" selection-end-column="137" />
+        <state relative-caret-position="451">
+          <caret line="103" column="75" lean-forward="true" selection-start-line="103" selection-start-column="75" selection-end-line="103" selection-end-column="75" />
           <folding>
             <element signature="e#24#86#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/spider/driver/base/driver.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="422">
+          <caret line="2265" column="57" lean-forward="true" selection-start-line="2265" selection-start-column="57" selection-end-line="2265" selection-end-column="57" />
+          <folding>
+            <element signature="e#23#53#0" expanded="true" />
           </folding>
         </state>
       </provider>

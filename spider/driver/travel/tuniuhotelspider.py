@@ -95,7 +95,7 @@ class TuniuHotelSpider(TravelDriver):
             self.error_log(e=e)
 
     def get_shop_info_list(self):
-        self.fast_get_page(url='http://hotel.tuniu.com/')
+        self.fast_get_page(url='http://hotel.tuniu.com/',min_time_to_wait=45,max_time_to_wait=60)
         self.focus_on_element_by_css_selector(css_selector='#txtCity')
         self.until_click_by_css_selector(css_selector='#txtCity')
         time.sleep(2)

@@ -2068,11 +2068,13 @@ class Driver(object):
                           'goog:chromeOptions': {'extensions': [], 'args': [self.curr_user_agent, '--headless']}, 'platform': 'ANY',
                           'version': ''})
 
-    def fast_get_page(self, url:str, try_times=15, is_max=False):
+    def fast_get_page(self, url:str, try_times=15, min_time_to_wait=5, max_time_to_wait=15, is_max=False):
         """
         打开网页快速加载页面,直到成功加载
         :param url:
         :param try_times:
+        :param min_time_to_wait:
+        :param max_time_to_wait:
         :param is_max:
         :return:
         """
@@ -2080,6 +2082,7 @@ class Driver(object):
             try:
                 if is_max:
                     self.driver.maximize_window()
+                self.driver.set_page_load_timeout(random.randint(min_time_to_wait, max_time_to_wait))
                 self.driver.get(url)
                 self.vertical_scroll_to()  # 滚动到页面底部
                 self.debug_log(data='经过%s次创建session和%s次关闭session,成功加载页面!!!'%(i,i-1))
@@ -2092,21 +2095,23 @@ class Driver(object):
                 else:
                     self.start_session()
                 time.sleep(1)
-                self.driver.set_page_load_timeout(random.randint(5,15))
+                self.driver.set_page_load_timeout(random.randint(min_time_to_wait,max_time_to_wait))
         self.exit_for_failing_to_load_page()
         return False
 
-    def fast_new_page(self, url:str, try_times=15):
+    def fast_new_page(self, url:str, try_times=15, min_time_to_wait=5, max_time_to_wait=15):
         """
         新建标签页码快速加载页面
         :param url:
         :param try_times:
+        :param min_time_to_wait:
+        :param max_time_to_wait:
         :return:
         """
         for i in range(1,try_times+1):
             try:
                 self.driver.switch_to.window(self.driver.window_handles[-1])
-                self.driver.set_page_load_timeout(random.randint(5,15))
+                self.driver.set_page_load_timeout(random.randint(min_time_to_wait, max_time_to_wait))
                 self.new_window(url)
                 self.driver.switch_to.window(self.driver.window_handles[-1])
                 self.driver.refresh()
@@ -2121,12 +2126,14 @@ class Driver(object):
         self.error_log(e='由于网络原因,无法加载页面,直接跳过!!!', istraceback=False)
         return False
 
-    def fast_click_page_by_css_selector(self, click_css_selector:str, ele=None, try_times=15):
+    def fast_click_page_by_css_selector(self, click_css_selector:str, ele=None, try_times=15, min_time_to_wait=5, max_time_to_wait=15):
         """
         点击快速加载页面
         :param click_css_selector:
         :param ele:
         :param try_times:
+        :param min_time_to_wait:
+        :param max_time_to_wait:
         :return:
         """
         if not ele:
@@ -2134,7 +2141,7 @@ class Driver(object):
         for i in range(1,try_times+1):
             try:
                 self.driver.switch_to.window(self.driver.window_handles[-1])
-                self.driver.set_page_load_timeout(random.randint(5,15))
+                self.driver.set_page_load_timeout(random.randint(min_time_to_wait, max_time_to_wait))
                 click_ele = self.until_presence_of_element_located_by_css_selector(ele=ele, css_selector=click_css_selector)
                 self.focus_on_element(ele=click_ele)
                 click_ele.click()
@@ -2150,19 +2157,21 @@ class Driver(object):
         self.error_log(e='由于网络原因,无法加载页面,直接跳过!!!', istraceback=False)
         return False
 
-    def fast_click_same_page_by_css_selector(self, click_css_selector:str, ele=None, try_times=15):
+    def fast_click_same_page_by_css_selector(self, click_css_selector:str, ele=None, try_times=15, min_time_to_wait=5, max_time_to_wait=15):
         """
         点击快速加载页面
         :param click_css_selector:
         :param ele:
         :param try_times:
+        :param min_time_to_wait:
+        :param max_time_to_wait:
         :return:
         """
         if not ele:
             ele = self.driver
         try:
             self.driver.switch_to.window(self.driver.window_handles[-1])
-            self.driver.set_page_load_timeout(random.randint(5,15))
+            self.driver.set_page_load_timeout(random.randint(min_time_to_wait, max_time_to_wait))
             click_ele = self.until_presence_of_element_located_by_css_selector(ele=ele, css_selector=click_css_selector)
             self.focus_on_element(ele=click_ele)
             click_ele.click()
@@ -2180,17 +2189,19 @@ class Driver(object):
             self.driver.close()
             self.driver.switch_to.window(self.driver.window_handles[-1])
 
-    def fast_click_first_item_page_by_partial_link_text(self, link_text:str, try_times=15):
+    def fast_click_first_item_page_by_partial_link_text(self, link_text:str, try_times=15, min_time_to_wait=5, max_time_to_wait=15):
         """
         点击列表第一个元素快速加载页面
         :param link_text:
         :param try_times:
+        :param min_time_to_wait:
+        :param max_time_to_wait:
         :return:
         """
         for i in range(1,try_times+1):
             try:
                 self.driver.switch_to.window(self.driver.window_handles[-1])
-                self.driver.set_page_load_timeout(random.randint(5,15))
+                self.driver.set_page_load_timeout(random.randint(min_time_to_wait, max_time_to_wait))
                 self.until_presence_of_all_elements_located_by_partial_link_text(link_text=link_text)[0].click()
                 self.driver.switch_to.window(self.driver.window_handles[-1])
                 self.driver.refresh()
