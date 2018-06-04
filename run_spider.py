@@ -39,7 +39,7 @@ if __name__ == '__main__':
         spider.run_spider()
     elif sys.argv[2]+sys.argv[4] == TravelSpiderName.ELONG_HOTEL:
         from spider.driver.travel.elonghotelspider import ElongHotelSpider
-        spider = ElongHotelSpider(isheadless=True,ismobile=False,isvirtualdisplay=False,
+        spider = ElongHotelSpider(isheadless=False,ismobile=False,isvirtualdisplay=False,
                                     spider_id=sys.argv[1],
                                     data_website=sys.argv[2],
                                     data_region=sys.argv[3],
