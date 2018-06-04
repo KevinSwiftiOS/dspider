@@ -2045,8 +2045,8 @@ class Driver(object):
             if add_data and data_list_tmp[i]:#如果add_data不为空
                 data_list_tmp[i].update(add_data)
                 if page.is_save:
-                    # if len(data_list_tmp[i]) == len(fieldlist_merge):
-                    self.save_data_to_mongodb(fieldlist=fieldlist_merge, mongodb=page.mongodb, data=data_list_tmp[i])#注意关键字段必定出现在前面一页
+                    if len(data_list_tmp[i]) == len(fieldlist_merge):
+                        self.save_data_to_mongodb(fieldlist=fieldlist_merge, mongodb=page.mongodb, data=data_list_tmp[i])#注意关键字段必定出现在前面一页
         return data_list_tmp
 
     def run_spider(self):
