@@ -8,7 +8,7 @@ shops = Mongodb(db=TravelDriver.db,collection=TravelDriver.shop_collection,host=
 comments = Mongodb(db=TravelDriver.db,collection=TravelDriver.comments_collection).get_collection()
 key = {
     FieldName.DATA_SOURCE:DataSourceName.HOTEL,
-    FieldName.DATA_WEBSITE:WebsiteName.TUNIU,
+    FieldName.DATA_WEBSITE:WebsiteName.ELONG,
 }
 print(shops.remove(key))
 
