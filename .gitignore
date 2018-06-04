@@ -103,6 +103,7 @@ ENV/
 
 # dspider_log
 log_*.txt*
+.idea/
 
 
 
