@@ -106,10 +106,10 @@ class FliggyHotelSpider(TravelDriver):
         time.sleep(1)
         self.until_presence_of_all_elements_located_by_partial_link_text(link_text='酒店')[0].click()
         time.sleep(1)
-        self.until_send_text_by_css_selector(css_selector='#J_HotelForm > ul > li:nth-child(1) > input.pi-input.J_ArrCity.ks-autocomplete-input', text='杭州市')
+        self.until_send_text_by_css_selector(css_selector='#J_HotelForm > ul > li:nth-child(1) > input.pi-input.J_ArrCity.ks-autocomplete-input', text=self.data_region)
         time.sleep(1)
-        self.until_send_text_by_css_selector(css_selector='#J_HotelForm > ul > li:nth-child(2) > input', text='千岛湖')
-        self.fast_enter_page_by_partial_link_text(css_selector='#J_HotelForm > ul > li:nth-child(1) > input.pi-input.J_ArrCity.ks-autocomplete-input')
+        self.until_send_text_by_css_selector(css_selector='#J_HotelForm > ul > li:nth-child(2) > input', text=self.data_region)
+        self.fast_enter_page_by_css_selector(css_selector='#J_HotelForm > ul > li:nth-child(1) > input.pi-input.J_ArrCity.ks-autocomplete-input')
         self.close_pre_page()
         time.sleep(1)
         self.vertical_scroll_to()  # 滚动到页面底部

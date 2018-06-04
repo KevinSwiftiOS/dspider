@@ -188,52 +188,11 @@ fl_shop2 = Fieldlist(
     Field(fieldname=FieldName.SHOP_AROUND_FACILITIES, css_selector='#hotel_info_comment > div', attr='innerHTML',filter_func=get_around_facilities),
 )
 
-fl_comment1 = Fieldlist(
-    Field(fieldname=FieldName.COMMENT_USER_NAME,css_selector='div.user_info.J_ctrip_pop > p.name'),
-    Field(fieldname=FieldName.COMMENT_CONTENT,css_selector='div.comment_main > div.comment_txt > div.J_commentDetail'),
-    # Field(fieldname=FieldName.COMMENT_GRADE,css_selector='div.comment_main > p > span.score > span'),
-    # Field(fieldname=FieldName.COMMENT_SCORE_TEXT,css_selector='div.comment_main > p > span.small_c',attr='data-value'),
-    # Field(fieldname=FieldName.COMMENT_ROOM,css_selector='div.comment_main > p > a'),
-    # Field(fieldname=FieldName.COMMENT_TIME,css_selector='div.comment_main > div.comment_txt > div.comment_bar > p > span'),
-    # Field(fieldname=FieldName.COMMENT_PIC_LIST,list_css_selector='div.comment_main > div.comment_txt > div.comment_pic > div',item_css_selector='img',attr='src'),
-    # Field(fieldname=FieldName.COMMENT_LIKE_NUM,css_selector='div.comment_main > div.comment_txt > div.comment_bar > a > span'),
-    # Field(fieldname=FieldName.COMMENT_DATE,css_selector='div.comment_main > p > span.date'),
-    # Field(fieldname=FieldName.COMMENT_TYPE,css_selector='div.comment_main > p > span.type')
-)
-
 page_shop_1 = Page(name='携程酒店店铺列表页面', fieldlist=fl_shop1, listcssselector=ListCssSelector(list_css_selector='#hotel_list > div.hotel_new_list', item_css_selector='ul.hotel_item'), mongodb=Mongodb(db=TravelDriver.db, collection=TravelDriver.shop_collection))
 
 page_shop_2 = Page(name='携程酒店店铺详情页面', fieldlist=fl_shop2, tabsetup=TabSetup(click_css_selector='li.hotel_price_icon > div.action_info > p > a'), mongodb=Mongodb(db=TravelDriver.db,collection=TravelDriver.shop_collection), is_save=True)
 
-page_comment_1 = Page(name='携程酒店店铺评论页面',fieldlist=fl_comment1,listcssselector=ListCssSelector(list_css_selector='#divCtripComment > div.comment_detail_list > div'), mongodb=Mongodb(db=TravelDriver.db, collection=TravelDriver.comments_collection))
-
 class XiechengHotelSpider(TravelDriver):
-    def get_comment_info3(self,shop_data):
-        external_key = {
-            FieldName.SHOP_URL : shop_data.get(FieldName.SHOP_URL),
-            FieldName.SHOP_NAME : shop_data.get(FieldName.SHOP_NAME),
-        }
-        # self.get_spider_data_list(page=page_comment_1,is_save=True,external_key=external_key,
-        #                           target=self.comments_collections)
-
-    def get_comment_info(self,shop_data):
-        try:
-            time.sleep(3)
-            self.until_click_no_next_page_by_css_selector(func=self.get_comment_info3,
-            css_selector='#divCtripComment > div.c_page_box > div > a.c_down',
-            shop_data=shop_data)
-        except Exception as e:
-            self.error_log(e=e)
-
-    def get_comment_info_list(self):
-        shop_data_list = self.get_current_data_list_from_mongodb(page_shop_1.mongodb.get_collection(),FieldName.SHOP_NAME,FieldName.SHOP_URL)
-        func1 = self.until_click_no_next_page_by_css_selector
-        def empty():
-            pass
-        def func():
-            func1(css_selector='#divCtripComment > div.c_page_box > div > a.c_down',pause_time=3,func=empty)
-        for shop_data in shop_data_list[:1]:
-            self.run_new_tab_task(url=shop_data.get(FieldName.SHOP_URL),func=func)
 
     def get_shop_info(self):
         try:
@@ -247,15 +206,12 @@ class XiechengHotelSpider(TravelDriver):
         time.sleep(1)
         self.until_presence_of_element_located_by_css_selector(css_selector="#txtCity").clear()
         self.until_send_text_by_css_selector(css_selector="#txtCity", text=self.data_region)
-        time.sleep(5)
         self.until_send_enter_by_css_selector(css_selector='#txtCity')
-        self.driver.set_page_load_timeout(10)
         self.fast_click_same_page_by_css_selector(click_css_selector='#btnSearch')
         self.until_click_no_next_page_by_css_selector(func=self.get_shop_info, css_selector='#downHerf.c_down')
 
     def run_spider(self):
         try:
             self.get_shop_info_list()
-            # self.get_comment_info_list()
         except Exception as e:
             self.error_log(e=e)

@@ -5,11 +5,11 @@ from spider.driver.travel.traveldriver import WebsiteName,DataSourceName,TravelD
 from spider.driver.base.mongodb import Mongodb
 import re
 import json
-shops = Mongodb(db=TravelDriver.db,collection=TravelDriver.shop_collection,host='10.1.17.15').get_collection()
+shops = Mongodb(db=TravelDriver.db,collection=TravelDriver.shop_collection,host='127.0.0.1').get_collection()
 comments = Mongodb(db=TravelDriver.db,collection=TravelDriver.comments_collection).get_collection()
 key = {
     FieldName.DATA_SOURCE:DataSourceName.HOTEL,
-    FieldName.DATA_WEBSITE:WebsiteName.FLIGGY,
+    FieldName.DATA_WEBSITE:WebsiteName.TUNIU,
 }
 print(shops.remove(key))
 

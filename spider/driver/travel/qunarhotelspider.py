@@ -124,10 +124,10 @@ class QunarHotelSpider(TravelDriver):
     def get_shop_info_list(self):
         self.fast_get_page('http://hotel.qunar.com/')
         time.sleep(1)
-        self.until_send_text_by_css_selector(css_selector='#toCity', text='杭州')
-        self.until_send_text_by_css_selector(css_selector='#q', text='千岛湖')
-        self.fast_enter_page_by_partial_link_text(css_selector='#q')
-        time.sleep(1)
+        self.until_send_text_by_css_selector(css_selector='#toCity', text=self.data_region)
+        self.until_send_enter_by_css_selector(css_selector='#toCity')
+        self.until_send_text_by_css_selector(css_selector='#q', text=self.data_region)
+        self.fast_enter_page_by_css_selector(css_selector='#q')
         self.vertical_scroll_to()#滚动到页面底部
         self.until_click_no_next_page_by_partial_link_text(link_text='下一页', func=self.get_shop_info)
 

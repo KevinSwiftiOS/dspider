@@ -79,7 +79,7 @@ class LvmamaHotelSpider(TravelDriver):
     def get_shop_info_list(self):
         self.fast_get_page(url='http://hotels.lvmama.com/hotel/')
         time.sleep(2)
-        self.until_send_text_by_css_selector(css_selector='#js_mdd',text='杭州,浙江')
+        self.until_send_text_by_css_selector(css_selector='#js_mdd',text=self.data_region)
         time.sleep(1)
         self.until_send_enter_by_css_selector(css_selector='#js_mdd')
         self.until_send_text_by_css_selector(css_selector='#js_keyword',text=self.data_region)

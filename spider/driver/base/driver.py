@@ -2045,8 +2045,8 @@ class Driver(object):
             if add_data and data_list_tmp[i]:#如果add_data不为空
                 data_list_tmp[i].update(add_data)
                 if page.is_save:
-                    if len(data_list_tmp[i]) == len(fieldlist_merge):
-                        self.save_data_to_mongodb(fieldlist=fieldlist_merge, mongodb=page.mongodb, data=data_list_tmp[i])#注意关键字段必定出现在前面一页
+                    # if len(data_list_tmp[i]) == len(fieldlist_merge):
+                    self.save_data_to_mongodb(fieldlist=fieldlist_merge, mongodb=page.mongodb, data=data_list_tmp[i])#注意关键字段必定出现在前面一页
         return data_list_tmp
 
     def run_spider(self):
@@ -2205,7 +2205,7 @@ class Driver(object):
         self.error_log(e='由于网络原因,无法加载页面,直接跳过!!!', istraceback=False)
         return False
 
-    def fast_enter_page_by_partial_link_text(self, css_selector:str, try_times=15):
+    def fast_enter_page_by_css_selector(self, css_selector:str, try_times=15):
         """
         快速点击回车键加载页面
         :param css_selector:
