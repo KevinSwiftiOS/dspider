@@ -19,6 +19,9 @@ class Mysql(object):
         self.db = db
         self.charset = charset
 
+    def __str__(self):
+        return str(vars(self))
+
     def get_db_conn(self):
         """
 

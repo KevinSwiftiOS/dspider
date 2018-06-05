@@ -193,7 +193,7 @@ class Field(object):
         :param isdebug:表示是否输出调试信息
         """
         self.fieldname = fieldname
-        self.fieldtype = FIELD_NAME_TYPE.get(fieldname)
+        self.fieldtype = (lambda x:FIELD_NAME_TYPE.get(x) if FIELD_NAME_TYPE.get(x) else FieldType.STR)(fieldname)
         self.css_selector = css_selector
         self.attr = attr
         self.regex = regex

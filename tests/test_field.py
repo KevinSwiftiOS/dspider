@@ -1,10 +1,8 @@
 # -*- coding:utf-8 -*-
 
-from spider.driver.base.field import Field,Fieldlist
-from spider.driver.base.regex import Regexlist,Regex
+from spider.driver.base.field import Field,Fieldlist,FIELD_NAME_TYPE,FieldType
 
-rl = Regexlist(Regex(1,2),Regex(3,4))
-f = Field(fieldname=12,regexlist=rl)
-fl = Fieldlist(f,f)
-print(Regexlist() == None)
+a = (lambda x:FIELD_NAME_TYPE.get(x) if FIELD_NAME_TYPE.get(x) else FieldType.STR)('shop_name')
+print(a)
+
 
