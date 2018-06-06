@@ -1442,7 +1442,7 @@ class Driver(object):
                 self.info_log(data='第%s次刷新!!!'%count)
                 self.driver.refresh()
 
-    def until_click_no_next_page_by_css_selector(self, func=None, css_selector='', timeout=1, pause_time=1, is_next=True, is_debug=False, try_times=8, current_css_selector='', **kwargs):
+    def until_click_no_next_page_by_css_selector(self, func=None, css_selector='', timeout=1, pause_time=1, is_next=True, is_debug=False, current_css_selector='', nocurrent_css_selector='', **kwargs):
         """
         根据css样式点击直到没有下一页
         :param func:
@@ -1451,7 +1451,6 @@ class Driver(object):
         :param pause_time:
         :param is_next:专门用来测试的时候使用,表示是否点击下一页
         :param is_debug:出错时候，是否停止
-        :param try_times:点击重试次数
         :param current_css_selector:当前页的css选择器
         :param kwargs:
         :return:
@@ -1469,10 +1468,19 @@ class Driver(object):
         while(True):
             count += 1
             if current_css_selector:#如果存在当前页页码的样式
+                if not nocurrent_css_selector:#必须要有结束标志
+                    raise ValueError
                 self.focus_on_element_by_css_selector(css_selector=current_css_selector)
                 current_page = int(self.until_presence_of_element_located_by_css_selector(css_selector=current_css_selector).text)
                 if pre_page == current_page:
-                    continue
+                    try:
+                        self.until_presence_of_element_located_by_css_selector(css_selector=nocurrent_css_selector)
+                        self.info_log(data='没有下一页了!!!')
+                        break
+                    except Exception:
+                        self.focus_on_element_by_css_selector(css_selector=css_selector)
+                        time.sleep(1)
+                        self.until_click_by_css_selector(css_selector=css_selector, timeout=timeout)
                 pre_page = current_page
             self.info_log(data='当前翻到第%s页...' % count)
             time.sleep(pause_time)
@@ -1481,18 +1489,8 @@ class Driver(object):
                 if not is_next:#在调试的时候不需要下一页
                     break
                 self.focus_on_element_by_css_selector(css_selector=css_selector)
-                time.sleep(2)
-                try:
-                    self.until_click_by_css_selector(css_selector=css_selector,timeout=timeout)
-                except Exception:
-                    self.warning_log(e='由于网络原因,点击下一页按钮可能出现错误!!!,需要多点击几次...')
-                    for i in range(try_times):
-                        time.sleep(3)
-                        try:
-                            self.until_click_by_css_selector(css_selector=css_selector, timeout=timeout)
-                            break
-                        except Exception:
-                            self.error_log(e='点击第%s次失败!!!'%i)
+                time.sleep(1)
+                self.until_click_by_css_selector(css_selector=css_selector,timeout=timeout)
             except Exception as e:
                 if is_debug:
                     self.debug_log(data='程序点击下一页出错,已经暂停程序,请检查出错的原因!!!')
@@ -1743,9 +1741,8 @@ class Driver(object):
             else:
                 self.error_log(name=field.fieldname,e='未指定样式选择器和目标元素,无法取得该字段内容!!!')
                 return
-            self.focus_on_element(ele=ele)
             ActionChains(self.driver).move_to_element(ele).perform()
-            self.vertical_scroll_by()
+            self.focus_on_element(ele=ele)
             if field.attr:
                 _str = ele.get_attribute(field.attr)
             else:
@@ -1786,9 +1783,8 @@ class Driver(object):
             else:
                 self.error_log(name=field.fieldname, e='未指定样式选择器和目标元素,无法取得该字段内容!!!')
                 return
-            self.focus_on_element(ele=ele)
             ActionChains(self.driver).move_to_element(ele).perform()
-            self.vertical_scroll_by()
+            self.focus_on_element(ele=ele)
             if field.attr:
                 _str = ele.get_attribute(field.attr)
             else:
@@ -1856,9 +1852,8 @@ class Driver(object):
             else:
                 self.error_log(name=field.fieldname, e='未指定样式选择器和目标元素,无法取得该字段内容!!!')
                 return
-            self.focus_on_element(ele=ele)
             ActionChains(self.driver).move_to_element(ele).perform()
-            self.vertical_scroll_by()
+            self.focus_on_element(ele=ele)
             if field.attr:
                 _str = ele.get_attribute(field.attr)
             else:
@@ -1900,9 +1895,8 @@ class Driver(object):
             else:
                 self.error_log(name=field.fieldname, e='未指定样式选择器和目标元素,无法取得该字段内容!!!')
                 return
-            self.focus_on_element(ele=ele)
             ActionChains(self.driver).move_to_element(ele).perform()
-            self.vertical_scroll_by()
+            self.focus_on_element(ele=ele)
             if field.attr:
                 _str = ele.get_attribute(field.attr)
             else:

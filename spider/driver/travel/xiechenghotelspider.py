@@ -212,7 +212,7 @@ def get_shop_comment(self:TravelDriver, _str):
     time.sleep(8)#为了缓冲页面排序的变化
     page_comment_1.fieldlist.append(Field(fieldname=FieldName.SHOP_NAME, fieldvalue=_str))
     try:
-        self.until_click_no_next_page_by_css_selector(func=self.from_page_get_data_list, css_selector='#divCtripComment > div.c_page_box > div > a.c_down', page=page_comment_1, current_css_selector='#divCtripComment > div.c_page_box > div > div.c_page_list.layoutfix > a.current > span', is_debug=True)
+        self.until_click_no_next_page_by_css_selector(func=self.from_page_get_data_list, css_selector='#divCtripComment > div.c_page_box > div > a.c_down', page=page_comment_1, current_css_selector='#divCtripComment > div.c_page_box > div > div.c_page_list.layoutfix > a.current > span', is_debug=True, nocurrent_css_selector='#divCtripComment > div.c_page_box > div > a.c_down_nocurrent')
     except Exception:
         pass
     return _str
@@ -227,7 +227,7 @@ fl_shop2 = Fieldlist(
     Field(fieldname=FieldName.SHOP_COMMENT, css_selector='#J_htl_info > div.name > h2.cn_n', filter_func=get_shop_comment),
 )
 
-page_shop_1 = Page(name='携程酒店店铺列表页面', fieldlist=fl_shop1, listcssselector=ListCssSelector(list_css_selector='#hotel_list > div.hotel_new_list', item_css_selector='ul.hotel_item', item_end=1), mongodb=Mongodb(db=TravelDriver.db, collection=TravelDriver.shop_collection))
+page_shop_1 = Page(name='携程酒店店铺列表页面', fieldlist=fl_shop1, listcssselector=ListCssSelector(list_css_selector='#hotel_list > div.hotel_new_list', item_css_selector='ul.hotel_item'), mongodb=Mongodb(db=TravelDriver.db, collection=TravelDriver.shop_collection))
 
 page_shop_2 = Page(name='携程酒店店铺详情页面', fieldlist=fl_shop2, tabsetup=TabSetup(click_css_selector='li.hotel_price_icon > div.action_info > p > a'), mongodb=Mongodb(db=TravelDriver.db,collection=TravelDriver.shop_collection), is_save=True)
 
@@ -241,14 +241,14 @@ class XiechengHotelSpider(TravelDriver):
             self.error_log(e=e)
 
     def get_shop_info_list(self):
-        self.fast_get_page('http://hotels.ctrip.com/', is_scroll_to_bottom=False)
+        self.fast_get_page('http://hotels.ctrip.com/', is_scroll_to_bottom=False,is_max=True)
         self.until_send_text_by_css_selector(css_selector="#txtCity", text=self.data_region)
         time.sleep(5)
         self.until_send_enter_by_css_selector(css_selector="#txtCity")
         time.sleep(3)
-        self.vertical_scroll_by(offset=500)
+        self.vertical_scroll_by(offset=300)
         self.fast_click_same_page_by_css_selector(click_css_selector='#btnSearch')
-        self.until_click_no_next_page_by_css_selector(func=self.get_shop_info, css_selector='#downHerf.c_down', is_next=False)
+        self.until_click_no_next_page_by_css_selector(func=self.get_shop_info, css_selector='#downHerf.c_down')
 
     def run_spider(self):
         try:
