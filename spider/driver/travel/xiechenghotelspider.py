@@ -246,7 +246,7 @@ class XiechengHotelSpider(TravelDriver):
         time.sleep(5)
         self.until_send_enter_by_css_selector(css_selector="#txtCity")
         time.sleep(3)
-        self.focus_on_element_by_css_selector(css_selector='#btnSearch')
+        self.vertical_scroll_by(offset=500)
         self.fast_click_same_page_by_css_selector(click_css_selector='#btnSearch')
         self.until_click_no_next_page_by_css_selector(func=self.get_shop_info, css_selector='#downHerf.c_down', is_next=False)
 
