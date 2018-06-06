@@ -28,8 +28,8 @@ fl_shop1 = Fieldlist(
 )
 
 
-def get_recommend_all_room_dict(self, str):
-    p = PyQuery(str)
+def get_recommend_all_room_dict(self, _str):
+    p = PyQuery(_str)
     item_list = []
     for each in p('tr').items():
         if each.attr('class'):
@@ -78,10 +78,10 @@ def get_recommend_all_room_dict(self, str):
     recommend_all_room_dict.setdefault('all_room', all_room_list)
     return json.dumps(recommend_all_room_dict, ensure_ascii=False)
 
-def get_favourable_room(self, str):
+def get_favourable_room(self, _str):
     favourable = {}
     room = {}
-    p = PyQuery(str)
+    p = PyQuery(_str)
     tr1 = p('tr.group_hotel.J_GroupRoom')
     room.setdefault('房型', (lambda x: x.strip() if x else x)(tr1('td.room_type').text()))
     room.setdefault('活动', (lambda x: x.strip() if x else x)(tr1('td.child_name').text()))
@@ -106,8 +106,8 @@ def get_favourable_room(self, str):
                           package_list)
     return json.dumps(favourable, ensure_ascii=False)
 
-def get_hotel_intro(self, str):
-    p = PyQuery(str)
+def get_hotel_intro(self, _str):
+    p = PyQuery(_str)
     hotel_intro_dict = {}
     # 酒店介绍
     intro = {}
@@ -146,8 +146,8 @@ def get_hotel_intro(self, str):
     hotel_intro_dict.setdefault('酒店政策', policy)
     return json.dumps(hotel_intro_dict, ensure_ascii=False)
 
-def get_shop_statistics(self, str):
-    p = PyQuery(str)
+def get_shop_statistics(self, _str):
+    p = PyQuery(_str)
     statistics = {}
     # 点评
     dianping = []
@@ -155,7 +155,7 @@ def get_shop_statistics(self, str):
         (lambda x: dianping.append(x.strip()) if x else '')(i.text())
     for i in p('div.comment_sumary_box>div.bar_score').items('p'):
         text = i.text()
-        dianping.append({re.sub(r'[^\u4e00-\u9fa5]', '', text):re.sub(r'[^\d.]', '', text)})
+        dianping.append({re.sub(r'[^\u4e00-\u9fa5]', '', text): re.sub(r'[^\d.]', '', text)})
     statistics.setdefault('点评', dianping)
     # 印象
     impression = []
@@ -166,17 +166,56 @@ def get_shop_statistics(self, str):
         impression.append({(lambda x: x if x else '第一个%s' % count)(re.sub(r'[^\u4e00-\u9fa5]', '', text)): re.sub(
             r'[^\d]', '', text)})
     statistics.setdefault('印象', impression)
+    left = []
+    for i in p('div.comment_box_bar_new.clearfix > div.bar_left').items('a'):
+        left.append({re.sub(r'[^\u4e00-\u9fa5]*', '', i.text()): re.sub(r'[^\d]*', '', i.text())})
+    statistics.setdefault('评论好评统计', left)
+    right = []
+    for i in p('div.comment_box_bar_new.clearfix > div.bar_right > select.select_room').text().split('\n')[1:]:
+        right.append({re.sub(r'[^\u4e00-\u9fa5]*', '', i): re.sub(r'[^\d]*', '', i)})
+    statistics.setdefault('评论房型统计', right)
     return json.dumps(statistics, ensure_ascii=False)
 
-def get_around_facilities(self, str):
-    str = re.sub(r'^.*<h2 class=\"detail_title\">周边设施</h2>(.*)$', r'\1', str)
-    p = PyQuery(str)
+def get_around_facilities(self, _str):
+    _str = re.sub(r'^.*<h2 class=\"detail_title\">周边设施</h2>(.*)$', r'\1', _str)
+    p = PyQuery(_str)
     around = {}
     for i in p('div.htl_info_table > table > tbody').items('tr'):
         item = (lambda x: x if x else '')(i.text()).split('\n')
         if len(item) >= 2:
             around.setdefault(item[0], (lambda x: x[1:] if len(x) >= 2 else [''])(item))
     return json.dumps(around, ensure_ascii=False)
+
+fl_comment1 = Fieldlist(
+    Field(fieldname=FieldName.COMMENT_USER_NAME, css_selector='div.user_info.J_ctrip_pop > p.name'),
+    Field(fieldname=FieldName.COMMENT_USER_IMG, css_selector='div.user_info.J_ctrip_pop > p.head > span > img', attr='src'),
+    Field(fieldname=FieldName.COMMENT_USER_CHECK_IN, css_selector='div.comment_main > p > span.date'),
+    Field(fieldname=FieldName.COMMENT_USER_ROOM, css_selector='div.comment_main > p > a'),
+    Field(fieldname=FieldName.COMMENT_TYPE, css_selector='div.comment_main > p > span.type'),
+    Field(fieldname=FieldName.COMMENT_SCORE, css_selector='div.comment_main > p > span.score', regex=r'[^\d.]*'),
+    Field(fieldname=FieldName.COMMENT_SCORE_TEXT, css_selector='div.comment_main > p > span.small_c', attr='data-value'),
+    Field(fieldname=FieldName.COMMENT_USER_NUM, css_selector='div.user_info.J_ctrip_pop > p.num'),
+    Field(fieldname=FieldName.COMMENT_CONTENT, css_selector='div.comment_main > div.comment_txt > div.J_commentDetail'),
+    Field(fieldname=FieldName.COMMENT_PIC_LIST, list_css_selector='div.comment_txt > div.comment_pic', item_css_selector='div.pic > img', attr='src'),
+    Field(fieldname=FieldName.COMMENT_REPLAY, css_selector='div.comment_main > div.htl_reply > p.text.text_other'),
+)
+
+page_comment_1 = Page(name='携程酒店评论列表', fieldlist=fl_comment1, listcssselector=ListCssSelector(list_css_selector='#divCtripComment > div.comment_detail_list > div.comment_block'), mongodb=Mongodb(db=TravelDriver.db, collection=TravelDriver.comments_collection), is_save=True)
+
+def get_shop_comment(self:TravelDriver, _str):
+    try:
+        self.focus_on_element_by_css_selector(css_selector='#divCtripComment > div.comment_box_bar_new.clearfix > div.bar_right > select.select_sort')
+        time.sleep(8)
+        self.until_select_by_visible_text_by_css_selector(css_selector='#divCtripComment > div.comment_box_bar_new.clearfix > div.bar_right > select.select_sort',text='入住时间排序')
+    except Exception:
+        self.error_log(e='点击入住时间排序出错!!!')
+    time.sleep(8)#为了缓冲页面排序的变化
+    page_comment_1.fieldlist.append(Field(fieldname=FieldName.SHOP_NAME, fieldvalue=_str))
+    try:
+        self.until_click_no_next_page_by_css_selector(func=self.from_page_get_data_list, css_selector='#divCtripComment > div.c_page_box > div > a.c_down', page=page_comment_1, current_css_selector='#divCtripComment > div.c_page_box > div > div.c_page_list.layoutfix > a.current > span', is_debug=True)
+    except Exception:
+        pass
+    return _str
 
 fl_shop2 = Fieldlist(
     Field(fieldname=FieldName.SHOP_ROOM_RECOMMEND_ALL,css_selector='#hotelRoomBox', attr='innerHTML', filter_func=get_recommend_all_room_dict,offset=6,try_times=20,pause_time=5),
@@ -185,9 +224,10 @@ fl_shop2 = Fieldlist(
     Field(fieldname=FieldName.SHOP_PHONE, css_selector='#J_realContact', attr='data-real', regex='^([^<]*).*$', repl=r'\1'),
     Field(fieldname=FieldName.SHOP_STATISTICS, css_selector='#commentList > div.detail_cmt_box',attr='innerHTML',filter_func=get_shop_statistics),
     Field(fieldname=FieldName.SHOP_AROUND_FACILITIES, css_selector='#hotel_info_comment > div', attr='innerHTML',filter_func=get_around_facilities),
+    Field(fieldname=FieldName.SHOP_COMMENT, css_selector='#J_htl_info > div.name > h2.cn_n', filter_func=get_shop_comment),
 )
 
-page_shop_1 = Page(name='携程酒店店铺列表页面', fieldlist=fl_shop1, listcssselector=ListCssSelector(list_css_selector='#hotel_list > div.hotel_new_list', item_css_selector='ul.hotel_item'), mongodb=Mongodb(db=TravelDriver.db, collection=TravelDriver.shop_collection))
+page_shop_1 = Page(name='携程酒店店铺列表页面', fieldlist=fl_shop1, listcssselector=ListCssSelector(list_css_selector='#hotel_list > div.hotel_new_list', item_css_selector='ul.hotel_item', item_end=1), mongodb=Mongodb(db=TravelDriver.db, collection=TravelDriver.shop_collection))
 
 page_shop_2 = Page(name='携程酒店店铺详情页面', fieldlist=fl_shop2, tabsetup=TabSetup(click_css_selector='li.hotel_price_icon > div.action_info > p > a'), mongodb=Mongodb(db=TravelDriver.db,collection=TravelDriver.shop_collection), is_save=True)
 
@@ -201,13 +241,11 @@ class XiechengHotelSpider(TravelDriver):
             self.error_log(e=e)
 
     def get_shop_info_list(self):
-        self.fast_get_page('http://hotels.ctrip.com/')
-        time.sleep(1)
-        self.until_presence_of_element_located_by_css_selector(css_selector="#txtCity").clear()
+        self.fast_get_page('http://hotels.ctrip.com/', is_scroll_to_bottom=False)
         self.until_send_text_by_css_selector(css_selector="#txtCity", text=self.data_region)
-        self.until_send_enter_by_css_selector(css_selector='#txtCity')
+        time.sleep(3)
         self.fast_click_same_page_by_css_selector(click_css_selector='#btnSearch')
-        self.until_click_no_next_page_by_css_selector(func=self.get_shop_info, css_selector='#downHerf.c_down')
+        self.until_click_no_next_page_by_css_selector(func=self.get_shop_info, css_selector='#downHerf.c_down', is_next=False)
 
     def run_spider(self):
         try:

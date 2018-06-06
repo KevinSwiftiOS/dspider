@@ -48,11 +48,16 @@ class FieldName(object):
     SHOP_RANK = 'shop_rank'#店铺排名
     SHOP_TRAFFIC = 'shop_traffic'#位置交通
     SHOP_TAG = 'shop_tag'#店铺标签
+    SHOP_COMMENT = 'shop_comment'#店铺评论
 
     COMMENT_USER_NAME = 'comment_user_name'#评论者的名字
     COMMENT_USER_ID = 'comment_user_id'#评论者的编号
     COMMENT_USER_IMG = 'comment_user_img'#评论者的头像
     COMMENT_USER_RATE = 'comment_user_rate'#评论者的等级
+    COMMENT_USER_CHECK_IN = 'comment_user_check_in'#评论者的入住时间
+    COMMENT_USER_ROOM = 'comment_user_room'#评论者的入住房间
+    COMMENT_SCORE = 'comment_score'#评论者的评分
+    COMMENT_USER_NUM = 'comment_user_num'#用户评论
     COMMENT_TIME = 'comment_time'#评论发表的时间
     COMMENT_DATE = 'comment_date'#店铺入住日期
     COMMENT_CONTENT = 'comment_content'#评论的内容
@@ -66,6 +71,7 @@ class FieldName(object):
     COMMENT_SCORE_TEXT = 'comment_score_text'#评论的文字打分
     COMMENT_ROOM = 'comment_room'#评论的酒店房间
     COMMENT_TYPE = 'comment_type'#评论的类型
+    COMMENT_REPLAY = 'comment_replay'#评论回复
 
 FIELD_NAME_TYPE = {
     FieldName.NONE : FieldType.NONE,
@@ -99,12 +105,17 @@ FIELD_NAME_TYPE = {
     FieldName.SHOP_RANK : FieldType.STR,
     FieldName.SHOP_TRAFFIC : FieldType.STR,
     FieldName.SHOP_TAG : FieldType.STR,
+    FieldName.SHOP_COMMENT : FieldType.STR,
 
     FieldName.COMMENT_USER_NAME : FieldType.KEY_STR,
     FieldName.COMMENT_USER_ID : FieldType.STR,
     FieldName.COMMENT_USER_IMG : FieldType.STR,
     FieldName.COMMENT_TIME : FieldType.KEY_STR,
     FieldName.COMMENT_DATE : FieldType.STR,
+    FieldName.COMMENT_USER_CHECK_IN : FieldType.KEY_STR,
+    FieldName.COMMENT_USER_ROOM : FieldType.KEY_STR,
+    FieldName.COMMENT_SCORE: FieldType.FLOAT,
+    FieldName.COMMENT_USER_NUM: FieldType.STR,
     FieldName.COMMENT_CONTENT : FieldType.STR,
     FieldName.COMMENT_USER_RATE : FieldType.STR,
     FieldName.COMMENT_REPLY_NUM : FieldType.INT,
@@ -117,6 +128,7 @@ FIELD_NAME_TYPE = {
     FieldName.COMMENT_SCORE_TEXT : FieldType.STR,
     FieldName.COMMENT_ROOM : FieldType.STR,
     FieldName.COMMENT_TYPE : FieldType.STR,
+    FieldName.COMMENT_REPLAY : FieldType.STR,
 }
 
 FIELD_NAME_ZH = {
@@ -152,11 +164,16 @@ FIELD_NAME_ZH = {
     FieldName.SHOP_RANK : '店铺排名',
     FieldName.SHOP_TRAFFIC : '位置交通',
     FieldName.SHOP_TAG : '店铺标签',
+    FieldName.SHOP_COMMENT : '店铺评论',
 
     FieldName.COMMENT_USER_NAME : '用户名称',
     FieldName.COMMENT_USER_ID : '用户编号',
     FieldName.COMMENT_USER_IMG : '用户头像',
     FieldName.COMMENT_USER_RATE : '用户等级',
+    FieldName.COMMENT_USER_CHECK_IN : '入住时间',
+    FieldName.COMMENT_USER_ROOM : '入住房间',
+    FieldName.COMMENT_SCORE : '用户评分',
+    FieldName.COMMENT_USER_NUM: '用户评论',
     FieldName.COMMENT_TIME : '发表时间',
     FieldName.COMMENT_DATE : '入住日期',
     FieldName.COMMENT_CONTENT : '评论内容',
@@ -170,12 +187,13 @@ FIELD_NAME_ZH = {
     FieldName.COMMENT_SCORE_TEXT : '文字打分',
     FieldName.COMMENT_ROOM : '评论房间',
     FieldName.COMMENT_TYPE : '评论类型',
+    FieldName.COMMENT_REPLAY : '评论回复',
 }
 
 #offset是每次为了寻找元素偏移的距离
 #try_times是为了寻找元素偏移的次数
 class Field(object):
-    def __init__(self, fieldname='', css_selector='', attr='', regex='', repl='', timeout=2, offset=20, try_times=1, list_css_selector='', item_css_selector='', pause_time=0, filter_func=None, is_debug=False):
+    def __init__(self, fieldname='', css_selector='', attr='', regex='', repl='', timeout=2, offset=20, try_times=1, list_css_selector='', item_css_selector='', pause_time=0, filter_func=None, is_debug=False, fieldvalue=None):
         """
 
         :param fieldname:字段的名称
@@ -190,7 +208,8 @@ class Field(object):
         :param item_css_selector:列表字段里面字段的css选择器
         :param pause_time:暂停的时间
         :param filter_func:过滤函数
-        :param isdebug:表示是否输出调试信息
+        :param is_debug:表示是否输出调试信息
+        :param fieldvalue:表示爬虫字段的值
         """
         self.fieldname = fieldname
         self.fieldtype = (lambda x:FIELD_NAME_TYPE.get(x) if FIELD_NAME_TYPE.get(x) else FieldType.STR)(fieldname)
@@ -206,6 +225,7 @@ class Field(object):
         self.pause_time = pause_time
         self.filter_func = filter_func
         self.is_debug = is_debug
+        self.fieldvalue = fieldvalue
 
     def __str__(self):
         if not self.fieldname:

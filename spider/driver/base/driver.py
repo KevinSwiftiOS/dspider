@@ -19,6 +19,7 @@ import re
 import json
 from selenium.common.exceptions import TimeoutException
 import sys
+from selenium.webdriver.support.ui import Select
 
 class Driver(object):
     desktop_user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.79 Safari/537.36 Edge/14.14393'
@@ -1441,7 +1442,7 @@ class Driver(object):
                 self.info_log(data='第%s次刷新!!!'%count)
                 self.driver.refresh()
 
-    def until_click_no_next_page_by_css_selector(self, func=None, css_selector='', timeout=1, pause_time=1, is_next=True, **kwargs):
+    def until_click_no_next_page_by_css_selector(self, func=None, css_selector='', timeout=1, pause_time=1, is_next=True, is_debug=False, try_times=8, current_css_selector='', **kwargs):
         """
         根据css样式点击直到没有下一页
         :param func:
@@ -1449,6 +1450,9 @@ class Driver(object):
         :param timeout:
         :param pause_time:
         :param is_next:专门用来测试的时候使用,表示是否点击下一页
+        :param is_debug:出错时候，是否停止
+        :param try_times:点击重试次数
+        :param current_css_selector:当前页的css选择器
         :param kwargs:
         :return:
         """
@@ -1461,8 +1465,15 @@ class Driver(object):
             func = empty_func
             self.warning_log(e='当前func为空,没有什么操作需要执行!!!')
         count = 0
+        pre_page = 0
         while(True):
             count += 1
+            if current_css_selector:#如果存在当前页页码的样式
+                self.focus_on_element_by_css_selector(css_selector=current_css_selector)
+                current_page = int(self.until_presence_of_element_located_by_css_selector(css_selector=current_css_selector).text)
+                if pre_page == current_page:
+                    continue
+                pre_page = current_page
             self.info_log(data='当前翻到第%s页...' % count)
             time.sleep(pause_time)
             try:
@@ -1470,8 +1481,23 @@ class Driver(object):
                 if not is_next:#在调试的时候不需要下一页
                     break
                 self.focus_on_element_by_css_selector(css_selector=css_selector)
-                self.until_click_by_css_selector(css_selector=css_selector,timeout=timeout)
+                time.sleep(2)
+                try:
+                    self.until_click_by_css_selector(css_selector=css_selector,timeout=timeout)
+                except Exception:
+                    self.warning_log(e='由于网络原因,点击下一页按钮可能出现错误!!!,需要多点击几次...')
+                    for i in range(try_times):
+                        time.sleep(3)
+                        try:
+                            self.until_click_by_css_selector(css_selector=css_selector, timeout=timeout)
+                            break
+                        except Exception:
+                            self.error_log(e='点击第%s次失败!!!'%i)
             except Exception as e:
+                if is_debug:
+                    self.debug_log(data='程序点击下一页出错,已经暂停程序,请检查出错的原因!!!')
+                    while(True):
+                        pass
                 self.error_log(e=str(e)+'\n没有下一页了!!!',istraceback=False)
                 break
 
@@ -1528,6 +1554,19 @@ class Driver(object):
             self.error_log(e='index不可以为空!!!')
             return None
         self.driver.switch_to.window(self.driver.window_handles[index])
+
+    def until_select_by_visible_text_by_css_selector(self, ele=None, css_selector='', text=''):
+        if not css_selector or not text:
+            self.error_log(e='css_selector和text都不可以为空!!!')
+        s = Select(self.until_presence_of_element_located_by_css_selector(ele=ele, css_selector=css_selector))
+        s.select_by_visible_text(text)
+
+    def until_select_by_value_by_css_selector(self, ele=None, css_selector='', value=''):
+        if not css_selector or not value:
+            self.error_log(e='css_selector和value都不可以为空!!!')
+        s = Select(self.until_presence_of_element_located_by_css_selector(ele=ele, css_selector=css_selector))
+        s.select_by_value(value)
+
 
 #######################################external function#####################################################
 
@@ -1601,7 +1640,7 @@ class Driver(object):
             else:
                 collection_curr.update(key, {'$set': data})
 
-    def save_data_to_mongodb(self, fieldlist=Fieldlist(), mongodb=Mongodb(), data={}):
+    def save_data_to_mongodb(self, fieldlist=Fieldlist(), mongodb=Mongodb(), data={}, external_key_name = []):
         """
         通过爬虫单元将数据保存到mongodb
         :param fieldlist:
@@ -1609,7 +1648,11 @@ class Driver(object):
         :param data:要保存的数据
         :return:
         """
-        field_key = []
+        if external_key_name:
+            field_key = []
+            field_key.extend(external_key_name)
+        else:
+            field_key = []
         for field in fieldlist:
             if field.fieldtype == FieldType.KEY_STR:
                 field_key.append(field.fieldname)
@@ -1683,6 +1726,8 @@ class Driver(object):
         :param ele:WebElement
         :return:
         """
+        if field.fieldvalue:#如果已经有爬虫的值
+            return field.fieldvalue
         time.sleep(field.pause_time)
         try:
             if ele and field.css_selector:
@@ -1724,6 +1769,8 @@ class Driver(object):
         :param ele:WebElement
         :return:
         """
+        if field.fieldvalue:#如果已经有爬虫的值
+            return field.fieldvalue
         time.sleep(field.pause_time)
         try:
             if ele and field.css_selector:
@@ -1765,6 +1812,8 @@ class Driver(object):
         :param ele:WebElement
         :return:
         """
+        if field.fieldvalue:#如果已经有爬虫的值
+            return field.fieldvalue
         time.sleep(field.pause_time)
         _list = []
         try:
@@ -1790,6 +1839,8 @@ class Driver(object):
         :param ele:WebElement
         :return:
         """
+        if field.fieldvalue:#如果已经有爬虫的值
+            return field.fieldvalue
         time.sleep(field.pause_time)
         try:
             if ele and field.css_selector:
@@ -1832,6 +1883,8 @@ class Driver(object):
         :param ele:WebElement
         :return:
         """
+        if field.fieldvalue:#如果已经有爬虫的值
+            return field.fieldvalue
         time.sleep(field.pause_time)
         try:
             if ele and field.css_selector:
@@ -2070,7 +2123,7 @@ class Driver(object):
                           'goog:chromeOptions': {'extensions': [], 'args': [self.curr_user_agent, '--headless']}, 'platform': 'ANY',
                           'version': ''})
 
-    def fast_get_page(self, url:str, try_times=15, min_time_to_wait=5, max_time_to_wait=15, is_max=False):
+    def fast_get_page(self, url:str, try_times=15, min_time_to_wait=5, max_time_to_wait=15, is_max=False, is_scroll_to_bottom=True):
         """
         打开网页快速加载页面,直到成功加载
         :param url:
@@ -2086,7 +2139,8 @@ class Driver(object):
                     self.driver.maximize_window()
                 self.driver.set_page_load_timeout(random.randint(min_time_to_wait, max_time_to_wait))
                 self.driver.get(url)
-                self.vertical_scroll_to()  # 滚动到页面底部
+                if is_scroll_to_bottom:
+                    self.vertical_scroll_to()  # 滚动到页面底部
                 self.debug_log(data='经过%s次创建session和%s次关闭session,成功加载页面!!!'%(i,i-1))
                 return True
             except Exception:
@@ -2101,7 +2155,7 @@ class Driver(object):
         self.exit_for_failing_to_load_page()
         return False
 
-    def fast_new_page(self, url:str, try_times=15, min_time_to_wait=5, max_time_to_wait=15):
+    def fast_new_page(self, url:str, try_times=15, min_time_to_wait=5, max_time_to_wait=15, is_scroll_to_bottom=True):
         """
         新建标签页码快速加载页面
         :param url:
@@ -2117,7 +2171,8 @@ class Driver(object):
                 self.new_window(url)
                 self.driver.switch_to.window(self.driver.window_handles[-1])
                 self.driver.refresh()
-                self.vertical_scroll_to()  # 滚动到页面底部
+                if is_scroll_to_bottom:
+                    self.vertical_scroll_to()  # 滚动到页面底部
                 self.debug_log(data='经过%s次创建标签页和%s次关闭标签页,成功加载页面!!!' % (i, i - 1))
                 return True
             except Exception:
@@ -2128,7 +2183,7 @@ class Driver(object):
         self.error_log(e='由于网络原因,无法加载页面,直接跳过!!!', istraceback=False)
         return False
 
-    def fast_click_page_by_css_selector(self, click_css_selector:str, ele=None, try_times=15, min_time_to_wait=5, max_time_to_wait=15):
+    def fast_click_page_by_css_selector(self, click_css_selector:str, ele=None, try_times=15, min_time_to_wait=5, max_time_to_wait=15, is_scroll_to_bottom=True):
         """
         点击快速加载页面
         :param click_css_selector:
@@ -2149,7 +2204,8 @@ class Driver(object):
                 click_ele.click()
                 self.driver.switch_to.window(self.driver.window_handles[-1])
                 self.driver.refresh()
-                self.vertical_scroll_to()  # 滚动到页面底部
+                if is_scroll_to_bottom:
+                    self.vertical_scroll_to()  # 滚动到页面底部
                 self.debug_log(data='经过%s次点击和%s次关闭标签页,成功加载页面!!!' % (i, i - 1))
                 return True
             except Exception:
@@ -2159,7 +2215,7 @@ class Driver(object):
         self.error_log(e='由于网络原因,无法加载页面,直接跳过!!!', istraceback=False)
         return False
 
-    def fast_click_same_page_by_css_selector(self, click_css_selector:str, ele=None, try_times=15, min_time_to_wait=5, max_time_to_wait=15):
+    def fast_click_same_page_by_css_selector(self, click_css_selector:str, ele=None, try_times=15, min_time_to_wait=5, max_time_to_wait=15, is_scroll_to_bottom=True):
         """
         点击快速加载页面
         :param click_css_selector:
@@ -2179,7 +2235,8 @@ class Driver(object):
             click_ele.click()
             self.driver.switch_to.window(self.driver.window_handles[-1])
             self.driver.refresh()
-            self.vertical_scroll_to()  # 滚动到页面底部
+            if is_scroll_to_bottom:
+                self.vertical_scroll_to()  # 滚动到页面底部
             self.debug_log(data='经过%s次点击和%s次关闭标签页,成功加载页面!!!' % (1, 1 - 1))
             return True
         except Exception:
@@ -2191,7 +2248,7 @@ class Driver(object):
             self.driver.close()
             self.driver.switch_to.window(self.driver.window_handles[-1])
 
-    def fast_click_first_item_page_by_partial_link_text(self, link_text:str, try_times=15, min_time_to_wait=5, max_time_to_wait=15):
+    def fast_click_first_item_page_by_partial_link_text(self, link_text:str, try_times=15, min_time_to_wait=5, max_time_to_wait=15, is_scroll_to_bottom=True):
         """
         点击列表第一个元素快速加载页面
         :param link_text:
@@ -2207,7 +2264,8 @@ class Driver(object):
                 self.until_presence_of_all_elements_located_by_partial_link_text(link_text=link_text)[0].click()
                 self.driver.switch_to.window(self.driver.window_handles[-1])
                 self.driver.refresh()
-                self.vertical_scroll_to()  # 滚动到页面底部
+                if is_scroll_to_bottom:
+                    self.vertical_scroll_to()  # 滚动到页面底部
                 self.debug_log(data='经过%s次点击和%s次关闭标签页,成功加载页面!!!' % (i, i - 1))
                 return True
             except Exception:

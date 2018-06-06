@@ -40,8 +40,9 @@ class WeixinSpider(Driver):
             self.fast_click_same_page_by_css_selector(click_css_selector='#scroll-header > form > div > input.swz2')
             for item in self.until_presence_of_all_elements_located_by_css_selector(css_selector='#main > div.news-box > ul > li'):
                 public_name = self.until_presence_of_element_located_by_css_selector(ele=item, css_selector='div > div.txt-box > p.tit > a').text
-                self.fast_click_page_by_css_selector(ele=item, click_css_selector='div > div.txt-box > p.tit > a')
-                self.driver.switch_to.window(self.driver.window_handles[-1])
-                shop_data_list = self.from_page_get_data_list(page=page_weixin_1)
-                self.driver.close()
-                self.driver.switch_to.window(self.driver.window_handles[-1])
+                print(public_name)
+                # self.fast_click_page_by_css_selector(ele=item, click_css_selector='div > div.txt-box > p.tit > a')
+                # self.driver.switch_to.window(self.driver.window_handles[-1])
+                # shop_data_list = self.from_page_get_data_list(page=page_weixin_1)
+                # self.driver.close()
+                # self.driver.switch_to.window(self.driver.window_handles[-1])
