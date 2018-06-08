@@ -48,7 +48,6 @@ class FieldName(object):
     SHOP_RANK = 'shop_rank'#店铺排名
     SHOP_TRAFFIC = 'shop_traffic'#位置交通
     SHOP_TAG = 'shop_tag'#店铺标签
-    SHOP_COMMENT = 'shop_comment'#店铺评论
 
     COMMENT_USER_NAME = 'comment_user_name'#评论者的名字
     COMMENT_USER_ID = 'comment_user_id'#评论者的编号
@@ -105,7 +104,6 @@ FIELD_NAME_TYPE = {
     FieldName.SHOP_RANK : FieldType.STR,
     FieldName.SHOP_TRAFFIC : FieldType.STR,
     FieldName.SHOP_TAG : FieldType.STR,
-    FieldName.SHOP_COMMENT : FieldType.STR,
 
     FieldName.COMMENT_USER_NAME : FieldType.KEY_STR,
     FieldName.COMMENT_USER_ID : FieldType.STR,
@@ -164,7 +162,6 @@ FIELD_NAME_ZH = {
     FieldName.SHOP_RANK : '店铺排名',
     FieldName.SHOP_TRAFFIC : '位置交通',
     FieldName.SHOP_TAG : '店铺标签',
-    FieldName.SHOP_COMMENT : '店铺评论',
 
     FieldName.COMMENT_USER_NAME : '用户名称',
     FieldName.COMMENT_USER_ID : '用户编号',
@@ -193,7 +190,7 @@ FIELD_NAME_ZH = {
 #offset是每次为了寻找元素偏移的距离
 #try_times是为了寻找元素偏移的次数
 class Field(object):
-    def __init__(self, fieldname='', css_selector='', attr='', regex='', repl='', timeout=2, offset=20, try_times=1, list_css_selector='', item_css_selector='', pause_time=0, filter_func=None, is_debug=False, fieldvalue=None):
+    def __init__(self, fieldname='', css_selector='', attr='', regex='', repl='', timeout=2, offset=20, try_times=1, list_css_selector='', item_css_selector='', pause_time=0, filter_func=None, is_debug=False, is_isolated=False):
         """
 
         :param fieldname:字段的名称
@@ -209,7 +206,7 @@ class Field(object):
         :param pause_time:暂停的时间
         :param filter_func:过滤函数
         :param is_debug:表示是否输出调试信息
-        :param fieldvalue:表示爬虫字段的值
+        :param is_isolated:表示爬虫字段的css_selector是否孤立
         """
         self.fieldname = fieldname
         self.fieldtype = (lambda x:FIELD_NAME_TYPE.get(x) if FIELD_NAME_TYPE.get(x) else FieldType.STR)(fieldname)
@@ -225,7 +222,7 @@ class Field(object):
         self.pause_time = pause_time
         self.filter_func = filter_func
         self.is_debug = is_debug
-        self.fieldvalue = fieldvalue
+        self.is_isolated = is_isolated
 
     def __str__(self):
         if not self.fieldname:

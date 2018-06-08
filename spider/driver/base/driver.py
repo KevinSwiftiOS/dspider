@@ -1,4 +1,5 @@
 # -*- coding:utf-8 -*-
+import warnings
 from selenium import webdriver
 from selenium.webdriver.remote.webelement import WebElement
 from pyvirtualdisplay import Display
@@ -20,6 +21,7 @@ import json
 from selenium.common.exceptions import TimeoutException
 import sys
 from selenium.webdriver.support.ui import Select
+from pymongo.collection import Collection
 
 class Driver(object):
     desktop_user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.79 Safari/537.36 Edge/14.14393'
@@ -69,6 +71,7 @@ class Driver(object):
         if self.isvirtualdisplay == False and self.isheadless == True:
             self.logger.debug('headless is running')
             options.add_argument('--headless')
+        options.add_argument('disable-infobars')#隐藏自动化软件测试的提示
         driver = webdriver.Chrome(chrome_options=options)
         driver.set_page_load_timeout(10)
         return driver
@@ -151,17 +154,76 @@ class Driver(object):
         """
         self.driver.execute_script('window.scrollTo(0, document.body.scrollHeight + %s)' % random.randint(min_offset,max_offset))
 
-    def vertical_scroll_to(self, offset=10000):
+    def vertical_scroll_to(self, offset=0):
         """
-        下拉滚动加载
+        下拉滚动加载, offset为0默认把页面下拉到最下端
         :param offset:
         :return:
         """
         self.driver.execute_script('window.scrollTo(0, document.body.scrollHeight + %s)' % offset)
 
+    def until_scroll_to_center_by_css_selector(self, css_selector:str, ele=None, timeout=10):
+        '''
+        把页面元素滚动到页面中间
+        :param css_selector:
+        :param ele:
+        :return:
+        '''
+        js_script = "window.scrollBy($(arguments[0])[0].getClientRects()[0].x + $(arguments[0])[0].clientWidth/2 - window.innerWidth/2, $(arguments[0])[0].getClientRects()[0].y + $(arguments[0])[0].clientHeight/2 - window.innerHeight/2)"
+        if not ele:
+            ele = self.driver
+        try:
+            self.driver.execute_script(js_script, self.until_presence_of_element_located_by_css_selector(ele=ele, css_selector=css_selector, timeout=timeout))
+        except Exception:
+            self.error_log(e='滚动到页面中间出错!!!')
+
+    def until_scroll_to_center_by_partial_link_text(self, link_text:str, ele=None, timeout=10):
+        '''
+        把页面元素滚动到页面中间
+        :param link_text:
+        :param ele:
+        :return:
+        '''
+        js_script = "window.scrollBy($(arguments[0])[0].getClientRects()[0].x + $(arguments[0])[0].clientWidth/2 - window.innerWidth/2, $(arguments[0])[0].getClientRects()[0].y + $(arguments[0])[0].clientHeight/2 - window.innerHeight/2)"
+        if not ele:
+            ele = self.driver
+        try:
+            self.driver.execute_script(js_script, self.until_presence_of_element_located_by_partial_link_text(ele=ele, link_text=link_text, timeout=timeout))
+        except Exception:
+            self.error_log(e='滚动到页面中间出错!!!')
+
+    def until_scroll_to_center_by_link_text(self, link_text:str, ele=None, timeout=10):
+        '''
+        把页面元素滚动到页面中间
+        :param link_text:
+        :param ele:
+        :return:
+        '''
+        js_script = "window.scrollBy($(arguments[0])[0].getClientRects()[0].x + $(arguments[0])[0].clientWidth/2 - window.innerWidth/2, $(arguments[0])[0].getClientRects()[0].y + $(arguments[0])[0].clientHeight/2 - window.innerHeight/2)"
+        if not ele:
+            ele = self.driver
+        try:
+            self.driver.execute_script(js_script, self.until_presence_of_element_located_by_link_text(ele=ele, link_text=link_text, timeout=timeout))
+        except Exception:
+            self.error_log(e='滚动到页面中间出错!!!')
+
+    def scroll_to_center(self, ele=None):
+        '''
+        把页面元素滚动到页面中间
+        :param ele:
+        :return:
+        '''
+        js_script = "window.scrollBy($(arguments[0])[0].getClientRects()[0].x + $(arguments[0])[0].clientWidth/2 - window.innerWidth/2, $(arguments[0])[0].getClientRects()[0].y + $(arguments[0])[0].clientHeight/2 - window.innerHeight/2)"
+        if not ele:
+            ele = self.driver
+        try:
+            self.driver.execute_script(js_script, ele)
+        except Exception:
+            self.error_log(e='滚动到页面中间出错!!!')
+
     def vertical_scroll_by(self, offset=100):
         """
-
+        页面默认向下滚动100
         :param offset:
         :return:
         """
@@ -169,248 +231,288 @@ class Driver(object):
 
     def scroll_into_view(self, ele:WebElement):
         """
-
+        Deprecated use scroll_element_to_center
         :param ele:
         :return:
         """
+        warnings.warn("use scroll_element_to_center instead", DeprecationWarning)
         self.driver.execute_script("arguments[0].scrollIntoView(false);", ele)
 
     def focus_on_element(self, ele:WebElement):
         """
-        把元素滚动到页面中间
+        Deprecated use scroll_element_to_center
         :param ele:
         :return:
         """
+        warnings.warn("use scroll_element_to_center instead", DeprecationWarning)
         self.driver.execute_script("arguments[0].focus();", ele)
 
-    def focus_on_element_by_css_selector(self, css_selector=''):
+    def focus_on_element_by_css_selector(self, css_selector:str):
         """
-        把元素滚动到页面中间
+        Deprecated until_scroll_element_to_center_by_css_selector
         :param css_selector:
         :return:
         """
+        warnings.warn("use until_scroll_element_to_center_by_css_selector instead", DeprecationWarning)
         ele = self.until_presence_of_element_located_by_css_selector(css_selector=css_selector)
         self.driver.execute_script("arguments[0].focus();", ele)
 
-    def focus_on_element_by_partial_link_text(self, link_text=''):
+    def focus_on_element_by_partial_link_text(self, link_text:str):
         """
-        把元素滚动到页面中间
+        Deprecated until_scroll_element_to_center_by_partial_link_text
         :param link_text:
         :return:
         """
+        warnings.warn("use until_scroll_element_to_center_by_partial_link_text instead", DeprecationWarning)
         ele = self.until_presence_of_element_located_by_partial_link_text(link_text=link_text)
         self.driver.execute_script("arguments[0].focus();", ele)
 
-    def until_scroll_into_view_by_css_selector(self, ele=None, css_selector=''):
+    def until_scroll_into_view_by_css_selector(self, css_selector:str, ele=None):
         """
-
+        Deprecated until_scroll_element_to_center_by_css_selector
         :param ele:WebElement
         :param css_selector:
         :return:
         """
-        if not css_selector:
-            self.error_log(e='css_selector不可以为空')
-            return
+        warnings.warn("use until_scroll_element_to_center_by_css_selector instead", DeprecationWarning)
         if not ele:
             ele = self.driver
         ele = self.until_presence_of_element_located_by_css_selector(ele=ele,css_selector=css_selector)
         self.driver.execute_script("arguments[0].scrollIntoView(false);", ele)
 
-    def until_scroll_into_view_by_partial_link_text(self, ele=None, link_text=''):
+    def until_scroll_into_view_by_partial_link_text(self, link_text:str, ele=None):
         """
-
+        Deprecated until_scroll_element_to_center_by_partial_link_text
         :param ele:WebElement
         :param link_text:
         :return:
         """
-        if not link_text:
-            self.error_log(e='link_text不可以为空')
-            return
+        warnings.warn("use until_scroll_element_to_center_by_partial_link_text instead", DeprecationWarning)
         if not ele:
             ele = self.driver
         ele = self.until_presence_of_element_located_by_partial_link_text(ele=ele, link_text=link_text)
         self.driver.execute_script("arguments[0].scrollIntoView(false);", ele)
 
-    def until_scroll_into_view_by_link_text(self, ele=None, link_text=''):
+    def until_scroll_into_view_by_link_text(self, link_text:str, ele=None):
         """
-
+        Deprecated until_scroll_element_to_center_by_link_text
         :param ele:
         :param link_text:
         :return:
         """
-        if not link_text:
-            self.error_log(e='link_text不可以为空')
-            return None
+        warnings.warn("use until_scroll_element_to_center_by_link_text instead", DeprecationWarning)
         if not ele:
             ele = self.driver
         ele = self.until_presence_of_element_located_by_link_text(ele=ele,link_text=link_text)
         self.driver.execute_script("arguments[0].scrollIntoView(false);", ele)
 
-    def until_click_by_css_selector(self, ele=None, timeout=10, css_selector=''):
+    def until_move_to_element_by_css_selector(self, css_selector:str, ele=None, timeout=10):
         """
-
-        :param ele:WebElement
-        :param timeout:
-        :param css_selector:
-        :return:
-        """
-        if not css_selector:
-            self.error_log(e='css_selector不可以为None')
-            return None
-        if not ele:
-            ele = self.driver
-        return WebDriverWait(driver=ele, timeout=timeout)\
-            .until(EC.element_to_be_clickable((By.CSS_SELECTOR, css_selector))).click()
-
-    def until_click_by_partial_link_text(self, ele=None, timeout=10, link_text=''):
-        """
-
-        :param ele:WebElement
-        :param timeout:
-        :param link_text:
-        :return:
-        """
-        if not link_text:
-            self.error_log(e='link_text不可以为None')
-            return None
-        if not ele:
-            ele = self.driver
-        return WebDriverWait(driver=ele, timeout=timeout)\
-            .until(EC.element_to_be_clickable((By.PARTIAL_LINK_TEXT, link_text))).click()
-
-    def until_click_by_link_text(self, ele=None, timeout=10, link_text=''):
-        """
-
-        :param ele:WebElement
-        :param timeout:
-        :param link_text:
-        :return:
-        """
-        if not link_text:
-            self.error_log(e='link_text不可以为None')
-            return None
-        if not ele:
-            ele = self.driver
-        return WebDriverWait(driver=ele, timeout=timeout)\
-            .until(EC.element_to_be_clickable((By.LINK_TEXT, link_text))).click()
-
-    def move_to_element(self, ele=None, xoffset=0, yoffset=0):
-        """
-
-        :param ele:WebElement
-        :param xoffset:
-        :param yoffset:
-        :return:
-        """
-        if not ele:
-            self.error_log(e='ele不可以为空')
-            return None
-        ActionChains(self.driver).move_to_element(ele).move_by_offset(xoffset=xoffset,yoffset=yoffset).perform()
-
-    def move_to_element_by_css_selector(self, ele=None, css_selector='', xoffset=0, yoffset=0):
-        """
-
-        :param ele:WebElement
-        :param xoffset:
-        :param yoffset:
-        :return:
-        """
-        if not css_selector:
-            self.error_log(e='css_selector不可以为空')
-            return None
-        if not ele:
-            ele = self.driver
-        ele = self.until_presence_of_element_located_by_css_selector(ele=ele, css_selector=css_selector)
-        ActionChains(self.driver).move_to_element(ele).move_by_offset(xoffset=xoffset,yoffset=yoffset).perform()
-
-    def until_move_to_element_by_css_selector(self, ele=None, css_selector='', timeout=10):
-        """
-
+        Deprecated until_scroll_element_to_center_by_css_selector
         :param ele:WebElement
         :param css_selector:
         :return:
         """
-        if not css_selector:
-            self.error_log(e='css_selector不可以为None')
-            return None
         if not ele:
             ele = self.driver
         ActionChains(self.driver).move_to_element(
             self.until_presence_of_element_located_by_css_selector(ele=ele,css_selector=css_selector,timeout=timeout)).perform()
 
-    def until_move_to_element_by_partial_link_text(self, ele=None, link_text='', timeout=10):
+    def until_move_to_element_by_partial_link_text(self, link_text:str, ele=None, timeout=10):
         """
-
+        Deprecated until_scroll_element_to_center_by_partial_link_text
         :param ele:WebElement
         :param link_text:
         :return:
         """
-        if not link_text:
-            self.error_log(e='link_text不可以为None')
-            return None
+        warnings.warn("use until_scroll_element_to_center_by_partial_link_text instead", DeprecationWarning)
         if not ele:
             ele = self.driver
         ActionChains(self.driver).move_to_element(
             self.until_presence_of_element_located_by_partial_link_text(ele=ele,link_text=link_text,timeout=timeout)).perform()
 
-    def until_move_to_element_by_link_text(self, ele=None, link_text='', timeout=10):
+    def until_move_to_element_by_link_text(self, link_text:str, ele=None, timeout=10):
         """
-
+        Deprecated until_scroll_element_to_center_by_link_text
         :param ele:WebElement
         :param link_text:
         :return:
         """
-        if not link_text:
-            self.error_log(e='link_text不可以为None')
-            return None
+        warnings.warn("use until_scroll_element_to_center_by_link_text instead", DeprecationWarning)
         if not ele:
             ele = self.driver
         ActionChains(self.driver).move_to_element(
             self.until_presence_of_element_located_by_link_text(ele=ele,link_text=link_text,timeout=timeout)).perform()
 
-    def until_send_enter_by_css_selector(self, ele=None, css_selector='', timeout=10):
+    def move_to_element(self, ele=None, xoffset=0, yoffset=0):
+        """
+        Deprecated scroll_element_to_center
+        :param ele:WebElement
+        :param xoffset:
+        :param yoffset:
+        :return:
+        """
+        warnings.warn("use scroll_element_to_center instead", DeprecationWarning)
+        if not ele:
+            self.error_log(e='ele不可以为空')
+            return None
+        ActionChains(self.driver).move_to_element(ele).move_by_offset(xoffset=xoffset,yoffset=yoffset).perform()
+
+    def until_scroll_to_center_click_by_css_selector(self, css_selector:str, ele=None, timeout=10):
+        """
+        :param ele:WebElement
+        :param timeout:
+        :param css_selector:
+        :return:
+        """
+        if not ele:
+            ele = self.driver
+        self.until_scroll_to_center_presence_of_element_located_by_css_selector(ele=ele, css_selector=css_selector, timeout=timeout).click()
+
+    def until_scroll_to_center_click_by_partial_link_text(self, link_text:str, ele=None, timeout=10):
+        """
+
+        :param ele:WebElement
+        :param timeout:
+        :param link_text:
+        :return:
+        """
+        if not ele:
+            ele = self.driver
+        self.until_scroll_to_center_presence_of_element_located_by_partial_link_text(ele=ele, link_text=link_text, timeout=timeout).click()
+
+    def until_scroll_to_center_click_by_link_text(self, link_text:str, ele=None, timeout=10):
+        """
+
+        :param ele:WebElement
+        :param timeout:
+        :param link_text:
+        :return:
+        """
+        if not ele:
+            ele = self.driver
+        self.until_scroll_to_center_presence_of_element_located_by_link_text(ele=ele, link_text=link_text, timeout=timeout).click()
+
+    def until_scroll_to_center_click_by_first_css_selector(self, css_selector:str, ele=None, timeout=10):
+        """
+        :param ele:WebElement
+        :param timeout:
+        :param css_selector:
+        :return:
+        """
+        if not ele:
+            ele = self.driver
+        ele= self.until_presence_of_all_elements_located_by_css_selector(ele=ele, css_selector=css_selector, timeout=timeout)[0]
+        self.scroll_to_center(ele=ele)
+        ele.click()
+
+    def until_scroll_to_center_click_by_first_partial_link_text(self, link_text:str, ele=None, timeout=10):
+        """
+
+        :param ele:WebElement
+        :param timeout:
+        :param link_text:
+        :return:
+        """
+        if not ele:
+            ele = self.driver
+        ele = self.until_presence_of_all_elements_located_by_partial_link_text(ele=ele, link_text=link_text, timeout=timeout)[0]
+        self.scroll_to_center(ele=ele)
+        ele.click()
+
+    def until_scroll_to_center_click_by_first_link_text(self, link_text:str, ele=None, timeout=10):
+        """
+
+        :param ele:WebElement
+        :param timeout:
+        :param link_text:
+        :return:
+        """
+        if not ele:
+            ele = self.driver
+        ele = self.until_presence_of_all_elements_located_by_link_text(ele=ele, link_text=link_text, timeout=timeout)[0]
+        self.scroll_to_center(ele=ele)
+        ele.click()
+
+    def until_scroll_to_center_click(self, ele:WebElement):
+        """
+
+        :param ele:WebElement
+        :return:
+        """
+        self.scroll_to_center(ele=ele)  # 元素居中
+        ele.click()
+
+    def until_scroll_to_center_send_enter_by_css_selector(self, css_selector:str, ele=None, timeout=10):
         """
 
         :param ele:WebElement
         :param css_selector:
         :return:
         """
-        if not css_selector:
-            self.error_log(e='css_selector不可以为空')
-            return None
+        if not ele:
+            ele = self.driver
+        self.until_scroll_to_center_by_css_selector(ele=ele, css_selector=css_selector, timeout=timeout)
+        self.until_presence_of_element_located_by_css_selector(ele=ele,css_selector=css_selector,timeout=timeout).send_keys(Keys.ENTER)
+
+    def until_send_enter_by_css_selector(self, css_selector:str, ele=None, timeout=10):
+        """
+
+        :param ele:WebElement
+        :param css_selector:
+        :return:
+        """
         if not ele:
             ele = self.driver
         self.until_presence_of_element_located_by_css_selector(ele=ele,css_selector=css_selector,timeout=timeout).send_keys(Keys.ENTER)
 
-    def until_send_enter_by_link_text(self, ele=None, link_text='', timeout=10):
+    def until_scroll_to_center_send_enter_by_link_text(self, link_text:str, ele=None, timeout=10):
         """
 
         :param ele:WebElement
         :param link_text:
         :return:
         """
-        if not link_text:
-            self.error_log(e='link_text不可以为空')
-            return None
+        if not ele:
+            ele = self.driver
+        self.until_scroll_to_center_by_link_text(ele=ele, link_text=link_text, timeout=timeout)
+        self.until_presence_of_element_located_by_link_text(ele=ele,link_text=link_text,timeout=timeout).send_keys(Keys.ENTER)
+
+    def until_send_enter_by_link_text(self, link_text:str, ele=None, timeout=10):
+        """
+
+        :param ele:WebElement
+        :param link_text:
+        :return:
+        """
         if not ele:
             ele = self.driver
         self.until_presence_of_element_located_by_link_text(ele=ele,link_text=link_text,timeout=timeout).send_keys(Keys.ENTER)
 
-    def until_send_enter_by_partial_link_text(self, ele=None, link_text='', timeout=10):
+    def until_scroll_to_center_send_enter_by_partial_link_text(self, link_text:str, ele=None, timeout=10):
         """
 
         :param ele:WebElement
         :param link_text:
         :return:
         """
-        if not link_text:
-            self.error_log(e='link_text不可以为空')
-            return None
+        if not ele:
+            ele = self.driver
+        self.until_scroll_to_center_by_partial_link_text(ele=ele, link_text=link_text, timeout=timeout)
+        self.until_presence_of_element_located_by_partial_link_text(ele=ele,link_text=link_text,timeout=timeout).send_keys(Keys.ENTER)
+
+    def until_send_enter_by_partial_link_text(self, link_text:str, ele=None, timeout=10):
+        """
+
+        :param ele:WebElement
+        :param link_text:
+        :return:
+        """
         if not ele:
             ele = self.driver
         self.until_presence_of_element_located_by_partial_link_text(ele=ele,link_text=link_text,timeout=timeout).send_keys(Keys.ENTER)
 
-    def until_send_text_by_css_selector(self, ele=None, css_selector='', text='', timeout=10):
+    def until_scroll_to_center_send_text_by_css_selector(self, text:str, css_selector:str, ele=None, timeout=10):
         """
 
         :param ele:WebElement
@@ -418,15 +520,27 @@ class Driver(object):
         :param text:
         :return:
         """
-        if not css_selector or not text:
-            self.error_log(e='css_selector和text都不可以为空')
-            return None
         if not ele:
             ele = self.driver
+        self.until_scroll_to_center_by_css_selector(ele=ele, css_selector=css_selector, timeout=timeout)
         self.until_presence_of_element_located_by_css_selector(ele=ele, css_selector=css_selector, timeout=timeout).clear()
         self.until_presence_of_element_located_by_css_selector(ele=ele,css_selector=css_selector,timeout=timeout).send_keys(text)
 
-    def until_get_elements_len_by_css_selector(self, ele=None, css_selector='', timeout=1):
+    def until_send_text_by_css_selector(self, text:str, css_selector:str, ele=None, timeout=10):
+        """
+
+        :param ele:WebElement
+        :param css_selector:
+        :param text:
+        :return:
+        """
+        if not ele:
+            ele = self.driver
+        self.until_presence_of_element_located_by_css_selector(ele=ele, css_selector=css_selector,
+                                                               timeout=timeout).clear()
+        self.until_presence_of_element_located_by_css_selector(ele=ele,css_selector=css_selector,timeout=timeout).send_keys(text)
+
+    def until_get_elements_len_by_css_selector(self, css_selector:str, ele=None, timeout=1):
         """
 
         :param ele:WebElement
@@ -434,15 +548,12 @@ class Driver(object):
         :param timeout:
         :return:
         """
-        if not css_selector:
-            self.error_log(e='css_selector不可以为空')
-            return None
         if not ele:
             ele = self.driver
         return len(self.until_presence_of_all_elements_located_by_css_selector(ele=ele,css_selector=css_selector,
                                                                                timeout=timeout))
 
-    def until_send_key_arrow_down_by_css_selector(self, ele=None,css_selector='', min_frequency=100, max_frequency=300, timeout=1):
+    def until_send_key_arrow_down_by_css_selector(self, css_selector:str, ele=None, min_frequency=100, max_frequency=300, timeout=1):
         """
 
         :param ele:WebElement
@@ -452,9 +563,6 @@ class Driver(object):
         :param timeout:
         :return:
         """
-        if not css_selector:
-            self.error_log(e='css_selector不可以为None')
-            return None
         if not ele:
             ele = self.driver
         for i in range(random.randint(min_frequency,max_frequency)):
@@ -462,7 +570,7 @@ class Driver(object):
                 self.until_presence_of_element_located_by_css_selector(ele=ele,css_selector=css_selector,timeout=timeout))\
                 .send_keys(Keys.ARROW_DOWN).perform()
 
-    def until_send_key_arrow_down_by_partial_link_text(self, ele=None,link_text='', frequency=100):
+    def until_send_key_arrow_down_by_partial_link_text(self, link_text:str, ele=None, frequency=100):
         """
 
         :param ele:WebElement
@@ -470,9 +578,6 @@ class Driver(object):
         :param frequency:
         :return:
         """
-        if not link_text:
-            self.error_log(e='link_text不可以为None')
-            return None
         if not ele:
             ele = self.driver
         for i in range(frequency):
@@ -480,7 +585,7 @@ class Driver(object):
                 self.until_presence_of_element_located_by_partial_link_text(ele=ele,link_text=link_text))\
                 .send_keys(Keys.ARROW_DOWN).perform()
 
-    def until_send_key_arrow_down_by_link_text(self, ele=None,link_text='', frequency=100):
+    def until_send_key_arrow_down_by_link_text(self, link_text:str, ele=None, frequency=100):
         """
 
         :param ele:WebElement
@@ -488,9 +593,6 @@ class Driver(object):
         :param frequency:
         :return:
         """
-        if not link_text:
-            self.error_log(e='link_text不可以为None')
-            return None
         if not ele:
             ele = self.driver
         for i in range(frequency):
@@ -498,7 +600,7 @@ class Driver(object):
                 self.until_presence_of_element_located_by_link_text(ele=ele,link_text=link_text))\
                 .send_keys(Keys.ARROW_DOWN).perform()
 
-    def until_title_is(self, ele=None, timeout=10, title=''):
+    def until_title_is(self, title:str, ele=None, timeout=10):
         """
         判断title,返回布尔值
         :param ele:WebElement
@@ -508,12 +610,9 @@ class Driver(object):
         """
         if not ele:
             ele = self.driver
-        if not title:
-            self.error_log(e='标题为空!!!')
-            return False
         return WebDriverWait(ele, timeout).until(EC.title_is(title))
 
-    def until_title_contains(self, ele=None, timeout=10, title=''):
+    def until_title_contains(self, title:str, ele=None, timeout=10):
         """
         判断title，返回布尔值
         :param ele:WebElement
@@ -523,12 +622,9 @@ class Driver(object):
         """
         if not ele:
             ele = self.driver
-        if not title:
-            self.error_log(e='标题为空!!!')
-            return False
         return WebDriverWait(ele,timeout).until(EC.title_contains(title))
 
-    def until_presence_of_element_located_by_id(self, ele=None, timeout=10, id=''):
+    def until_presence_of_element_located_by_id(self, id:str, ele=None, timeout=10):
         """
         判断某个元素是否被加到了dom树里，并不代表该元素一定可见，如果定位到就返回WebElement
         :param ele:WebElement
@@ -538,12 +634,9 @@ class Driver(object):
         """
         if not ele:
             ele = self.driver
-        if not id:
-            self.error_log(e='id为空!!!')
-            return None
         return WebDriverWait(ele, timeout).until(EC.presence_of_element_located((By.ID, id)))
 
-    def until_presence_of_element_located_by_css_selector(self, ele=None, timeout=10, css_selector=''):
+    def until_presence_of_element_located_by_css_selector(self, css_selector:str, ele=None, timeout=10):
         """
         判断某个元素是否被加到了dom树里，并不代表该元素一定可见，如果定位到就返回WebElement
         :param ele:WebElement
@@ -553,12 +646,22 @@ class Driver(object):
         """
         if not ele:
             ele = self.driver
-        if not css_selector:
-            self.error_log(e='css_selector为空!!!')
-            return None
         return WebDriverWait(ele, timeout).until(EC.presence_of_element_located((By.CSS_SELECTOR, css_selector)))
 
-    def until_presence_of_element_located_by_link_text(self, ele=None, timeout=10, link_text=''):
+    def until_scroll_to_center_presence_of_element_located_by_css_selector(self, css_selector:str, ele=None, timeout=10):
+        """
+        判断某个元素是否被加到了dom树里，并不代表该元素一定可见，如果定位到就返回WebElement
+        :param ele:WebElement
+        :param timeout:
+        :param css_selector:
+        :return:
+        """
+        if not ele:
+            ele = self.driver
+        self.until_scroll_to_center_by_css_selector(ele=ele, css_selector=css_selector)#元素居中
+        return self.until_presence_of_element_located_by_css_selector(ele=ele, css_selector=css_selector, timeout=timeout)
+
+    def until_presence_of_element_located_by_link_text(self, link_text:str, ele=None, timeout=10):
         """
         判断某个元素是否被加到了dom树里，并不代表该元素一定可见，如果定位到就返回WebElement
         :param ele:WebElement
@@ -568,12 +671,9 @@ class Driver(object):
         """
         if not ele:
             ele = self.driver
-        if not link_text:
-            self.error_log(e='link_text为空!!!')
-            return None
         return WebDriverWait(ele, timeout).until(EC.presence_of_element_located((By.LINK_TEXT, link_text)))
 
-    def until_presence_of_element_located_by_partial_link_text(self, ele=None, timeout=10, link_text=''):
+    def until_scroll_to_center_presence_of_element_located_by_link_text(self, link_text:str, ele=None, timeout=10):
         """
         判断某个元素是否被加到了dom树里，并不代表该元素一定可见，如果定位到就返回WebElement
         :param ele:WebElement
@@ -583,12 +683,35 @@ class Driver(object):
         """
         if not ele:
             ele = self.driver
-        if not link_text:
-            self.error_log(e='link_text为空!!!')
-            return None
+        self.until_scroll_to_center_by_link_text(ele=ele, link_text=link_text)
+        return self.until_presence_of_element_located_by_link_text(ele=ele, link_text=link_text, timeout=timeout)
+
+    def until_presence_of_element_located_by_partial_link_text(self, link_text:str, ele=None, timeout=10):
+        """
+        判断某个元素是否被加到了dom树里，并不代表该元素一定可见，如果定位到就返回WebElement
+        :param ele:WebElement
+        :param timeout:
+        :param link_text:
+        :return:
+        """
+        if not ele:
+            ele = self.driver
         return WebDriverWait(ele, timeout).until(EC.presence_of_element_located((By.PARTIAL_LINK_TEXT, link_text)))
 
-    def until_visibility_of_by_id(self, ele=None, timeout=10, id=''):
+    def until_scroll_to_center_presence_of_element_located_by_partial_link_text(self, link_text:str, ele=None, timeout=10):
+        """
+        判断某个元素是否被加到了dom树里，并不代表该元素一定可见，如果定位到就返回WebElement
+        :param ele:WebElement
+        :param timeout:
+        :param link_text:
+        :return:
+        """
+        if not ele:
+            ele = self.driver
+        self.until_scroll_to_center_by_partial_link_text(ele=ele, link_text=link_text)
+        return self.until_presence_of_element_located_by_partial_link_text(ele=ele, link_text=link_text, timeout=timeout)
+
+    def until_visibility_of_by_id(self, id:str, ele=None, timeout=10):
         """
         判断元素是否可见，如果可见就返回这个元素
         :param ele:WebElement
@@ -598,12 +721,9 @@ class Driver(object):
         """
         if not ele:
             ele = self.driver
-        if not id:
-            self.error_log(e='id为空!!!')
-            return None
         return WebDriverWait(ele, timeout).until(EC.visibility_of((By.ID, id)))
 
-    def until_visibility_of_by_css_selector(self, ele=None, timeout=10, css_selector=''):
+    def until_visibility_of_by_css_selector(self, css_selector:str, ele=None, timeout=10):
         """
         判断元素是否可见，如果可见就返回这个元素
         :param ele:WebElement
@@ -613,12 +733,9 @@ class Driver(object):
         """
         if not ele:
             ele = self.driver
-        if not css_selector:
-            self.error_log(e='css_selector为空!!!')
-            return None
         return WebDriverWait(ele, timeout).until(EC.visibility_of((By.CSS_SELECTOR, css_selector)))
 
-    def until_visibility_of_by_link_text(self, ele=None, timeout=10, link_text=''):
+    def until_visibility_of_by_link_text(self, link_text:str, ele=None, timeout=10):
         """
         判断元素是否可见，如果可见就返回这个元素
         :param ele:WebElement
@@ -628,12 +745,9 @@ class Driver(object):
         """
         if not ele:
             ele = self.driver
-        if not link_text:
-            self.error_log(e='link_text为空!!!')
-            return None
         return WebDriverWait(ele, timeout).until(EC.visibility_of((By.LINK_TEXT, link_text)))
 
-    def until_visibility_of_by_partial_link_text(self, ele=None, timeout=10, partial_link_text=''):
+    def until_visibility_of_by_partial_link_text(self, partial_link_text:str, ele=None, timeout=10):
         """
         判断元素是否可见，如果可见就返回这个元素
         :param ele:WebElement
@@ -643,12 +757,9 @@ class Driver(object):
         """
         if not ele:
             ele = self.driver
-        if not partial_link_text:
-            self.error_log(e='partial_link_text为空!!!')
-            return None
         return WebDriverWait(ele, timeout).until(EC.visibility_of((By.PARTIAL_LINK_TEXT, partial_link_text)))
 
-    def until_presence_of_all_elements_located_by_id(self, ele=None, timeout=10, id=''):
+    def until_presence_of_all_elements_located_by_id(self, id:str, ele=None, timeout=10):
         """
         判断是否至少有1个元素存在于dom树中，如果定位到就返回列表
         :param ele:WebElement
@@ -658,12 +769,9 @@ class Driver(object):
         """
         if not ele:
             ele = self.driver
-        if not id:
-            self.error_log(e='id为空!!!')
-            return None
         return WebDriverWait(ele, timeout).until(EC.presence_of_all_elements_located((By.ID, id)))
 
-    def until_presence_of_all_elements_located_by_css_selector(self, ele=None, timeout=10, css_selector=''):
+    def until_presence_of_all_elements_located_by_css_selector(self, css_selector:str, ele=None, timeout=10):
         """
         判断是否至少有1个元素存在于dom树中，如果定位到就返回列表
         :param ele:WebElement
@@ -673,12 +781,9 @@ class Driver(object):
         """
         if not ele:
             ele = self.driver
-        if not css_selector:
-            self.error_log(e='css_selector为空!!!')
-            return None
         return WebDriverWait(ele, timeout).until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, css_selector)))
 
-    def until_presence_of_all_elements_located_by_link_text(self, ele=None, timeout=10, link_text=''):
+    def until_presence_of_all_elements_located_by_link_text(self, link_text:str, ele=None, timeout=10):
         """
         判断是否至少有1个元素存在于dom树中，如果定位到就返回列表
         :param ele:WebElement
@@ -688,12 +793,9 @@ class Driver(object):
         """
         if not ele:
             ele = self.driver
-        if not link_text:
-            self.error_log(e='link_text为空!!!')
-            return None
         return WebDriverWait(ele, timeout).until(EC.presence_of_all_elements_located((By.LINK_TEXT, link_text)))
 
-    def until_presence_of_all_elements_located_by_partial_link_text(self, ele=None, timeout=10, link_text=''):
+    def until_presence_of_all_elements_located_by_partial_link_text(self, link_text:str, ele=None, timeout=10):
         """
         判断是否至少有1个元素存在于dom树中，如果定位到就返回列表
         :param ele:WebElement
@@ -703,12 +805,9 @@ class Driver(object):
         """
         if not ele:
             ele = self.driver
-        if not link_text:
-            self.error_log(e='link_text为空!!!')
-            return None
         return WebDriverWait(ele, timeout).until(EC.presence_of_all_elements_located((By.PARTIAL_LINK_TEXT, link_text)))
 
-    def until_visibility_of_any_elements_located_by_id(self, ele=None, timeout=10, id=''):
+    def until_visibility_of_any_elements_located_by_id(self, id:str, ele=None, timeout=10):
         """
         判断是否至少有一个元素在页面中可见，如果定位到就返回列表
         :param ele:WebElement
@@ -718,12 +817,9 @@ class Driver(object):
         """
         if not ele:
             ele = self.driver
-        if not id:
-            self.error_log(e='id为空!!!')
-            return None
         return WebDriverWait(ele, timeout).until(EC.presence_of_all_elements_located((By.ID, id)))
 
-    def until_visibility_of_any_elements_located_by_css_selector(self, ele=None, timeout=10, css_selector=''):
+    def until_visibility_of_any_elements_located_by_css_selector(self, css_selector:str, ele=None, timeout=10):
         """
         判断是否至少有一个元素在页面中可见，如果定位到就返回列表
         :param ele:WebElement
@@ -733,12 +829,9 @@ class Driver(object):
         """
         if not ele:
             ele = self.driver
-        if not css_selector:
-            self.error_log(e='css_selector为空!!!')
-            return None
         return WebDriverWait(ele, timeout).until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, css_selector)))
 
-    def until_visibility_of_any_elements_located_by_link_text(self, ele=None, timeout=10, link_text=''):
+    def until_visibility_of_any_elements_located_by_link_text(self, link_text:str, ele=None, timeout=10):
         """
         判断是否至少有一个元素在页面中可见，如果定位到就返回列表
         :param ele:WebElement
@@ -748,12 +841,9 @@ class Driver(object):
         """
         if not ele:
             ele = self.driver
-        if not link_text:
-            self.error_log(e='link_text为空!!!')
-            return None
         return WebDriverWait(ele, timeout).until(EC.presence_of_all_elements_located((By.LINK_TEXT, link_text)))
 
-    def until_visibility_of_any_elements_located_by_partial_link_text(self, ele=None, timeout=10, link_text=''):
+    def until_visibility_of_any_elements_located_by_partial_link_text(self, link_text:str, ele=None, timeout=10):
         """
         判断是否至少有一个元素在页面中可见，如果定位到就返回列表
         :param ele:WebElement
@@ -763,12 +853,9 @@ class Driver(object):
         """
         if not ele:
             ele = self.driver
-        if not link_text:
-            self.error_log(e='link_text为空!!!')
-            return None
         return WebDriverWait(ele, timeout).until(EC.presence_of_all_elements_located((By.PARTIAL_LINK_TEXT, link_text)))
 
-    def until_text_to_be_present_in_element_located_by_id(self, ele=None, timeout=10, id=''):
+    def until_text_to_be_present_in_element_located_by_id(self, id:str, ele=None, timeout=10):
         """
         判断指定的元素中是否包含了预期的字符串，返回布尔值
         :param ele:WebElement
@@ -778,12 +865,9 @@ class Driver(object):
         """
         if not ele:
             ele = self.driver
-        if not id:
-            self.error_log(e='id为空!!!')
-            return None
         return WebDriverWait(ele, timeout).until(EC.presence_of_all_elements_located((By.ID, id)))
 
-    def until_text_to_be_present_in_element_located_by_css_selector(self, ele=None, timeout=10, css_selector=''):
+    def until_text_to_be_present_in_element_located_by_css_selector(self, css_selector:str, ele=None, timeout=10):
         """
         判断指定的元素中是否包含了预期的字符串，返回布尔值
         :param ele:WebElement
@@ -793,12 +877,9 @@ class Driver(object):
         """
         if not ele:
             ele = self.driver
-        if not css_selector:
-            self.error_log(e='css_selector为空!!!')
-            return None
         return WebDriverWait(ele, timeout).until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, css_selector)))
 
-    def until_text_to_be_present_in_element_located_by_link_text(self, ele=None, timeout=10, link_text=''):
+    def until_text_to_be_present_in_element_located_by_link_text(self, link_text:str, ele=None, timeout=10):
         """
         判断指定的元素中是否包含了预期的字符串，返回布尔值
         :param ele:WebElement
@@ -808,12 +889,9 @@ class Driver(object):
         """
         if not ele:
             ele = self.driver
-        if not link_text:
-            self.error_log(e='link_text为空!!!')
-            return None
         return WebDriverWait(ele, timeout).until(EC.presence_of_all_elements_located((By.LINK_TEXT, link_text)))
 
-    def until_text_to_be_present_in_element_located_by_partial_link_text(self, ele=None, timeout=10, link_text=''):
+    def until_text_to_be_present_in_element_located_by_partial_link_text(self, link_text:str, ele=None, timeout=10):
         """
         判断指定的元素中是否包含了预期的字符串，返回布尔值
         :param ele:WebElement
@@ -823,77 +901,62 @@ class Driver(object):
         """
         if not ele:
             ele = self.driver
-        if not link_text:
-            self.error_log(e='link_text为空!!!')
-            return None
         return WebDriverWait(ele, timeout).until(EC.presence_of_all_elements_located((By.PARTIAL_LINK_TEXT, link_text)))
 
-    def until_text_to_be_present_in_element_value_by_id(self, ele=None, timeout=10, id='', _text=''):
+    def until_text_to_be_present_in_element_value_by_id(self, id:str, text:str, ele=None, timeout=10):
         """
         判断指定元素的属性值中是否包含了预期的字符串，返回布尔值
         :param ele:WebElement
         :param timeout:
         :param id:
-        :param _text:
+        :param text:
         :return:
         """
         if not ele:
             ele = self.driver
-        if not id:
-            self.error_log(e='id为空!!!')
-            return None
-        return WebDriverWait(ele, timeout).until(EC.text_to_be_present_in_element_value((By.ID, id),_text))
+        return WebDriverWait(ele, timeout).until(EC.text_to_be_present_in_element_value((By.ID, id),text))
 
-    def until_text_to_be_present_in_element_value_by_css_selector(self, ele=None, timeout=10, css_selector=None, _text=None):
+    def until_text_to_be_present_in_element_value_by_css_selector(self, css_selector:str, text:str, ele=None, timeout=10):
         """
         判断指定元素的属性值中是否包含了预期的字符串，返回布尔值
         :param ele:WebElement
         :param timeout:
         :param css_selector:
-        :param _text:
+        :param text:
         :return:
         """
         if not ele:
             ele = self.driver
-        if not css_selector:
-            self.error_log(e='css_selector为空!!!')
-            return None
         return WebDriverWait(ele, timeout).until(EC.text_to_be_present_in_element_value((By.CSS_SELECTOR, css_selector),
-                                                                                        _text))
+                                                                                        text))
 
-    def until_text_to_be_present_in_element_value_by_link_text(self, ele=None, timeout=10, link_text='', _text=''):
+    def until_text_to_be_present_in_element_value_by_link_text(self, link_text:str, text:str, ele=None, timeout=10):
         """
         判断指定元素的属性值中是否包含了预期的字符串，返回布尔值
         :param ele:WebElement
         :param timeout:
         :param link_text:
-        :param _text:
+        :param text:
         :return:
         """
         if not ele:
             ele = self.driver
-        if not link_text:
-            self.error_log(e='link_text为空!!!')
-            return None
         return WebDriverWait(ele, timeout).until(EC.text_to_be_present_in_element_value((By.LINK_TEXT, link_text),
-                                                                                        _text))
+                                                                                        text))
 
-    def until_text_to_be_present_in_element_value_by_partial_link_text(self, ele=None, timeout=10, link_text='', _text=''):
+    def until_text_to_be_present_in_element_value_by_partial_link_text(self, link_text:str, text:str, ele=None, timeout=10):
         """
         判断指定元素的属性值中是否包含了预期的字符串，返回布尔值
         :param ele:WebElement
         :param timeout:
         :param link_text:
-        :param _text:
+        :param text:
         :return:
         """
         if not ele:
             ele = self.driver
-        if not link_text:
-            self.error_log(e='link_text为空!!!')
-            return None
         return WebDriverWait(ele, timeout).until(EC.text_to_be_present_in_element_value((By.PARTIAL_LINK_TEXT, link_text),
-                                                                                        _text))
+                                                                                        text))
 
     def until_frame_to_be_available_and_switch_to_it(self, ele=None, timeout=10):
         """
@@ -906,7 +969,7 @@ class Driver(object):
             ele = self.driver
         return WebDriverWait(ele, timeout).until(EC.frame_to_be_available_and_switch_to_it(ele))
 
-    def until_invisibility_of_element_located_by_id(self, ele=None, timeout=10, id=''):
+    def until_invisibility_of_element_located_by_id(self, id:str, ele=None, timeout=10):
         """
         判断某个元素在是否存在于dom或不可见,如果可见返回False,不可见返回这个元素
         :param ele:WebElement
@@ -916,12 +979,9 @@ class Driver(object):
         """
         if not ele:
             ele = self.driver
-        if not id:
-            self.error_log(e='id为空!!!')
-            return None
         return WebDriverWait(ele, timeout).until(EC.invisibility_of_element_located((By.ID, id)))
 
-    def until_invisibility_of_element_located_by_css_selector(self, ele=None, timeout=10, css_selector=''):
+    def until_invisibility_of_element_located_by_css_selector(self, css_selector:str, ele=None, timeout=10):
         """
         判断某个元素在是否存在于dom或不可见,如果可见返回False,不可见返回这个元素
         :param ele:WebElement
@@ -931,12 +991,9 @@ class Driver(object):
         """
         if not ele:
             ele = self.driver
-        if not css_selector:
-            self.error_log(e='css_selector为空!!!')
-            return None
         return WebDriverWait(ele, timeout).until(EC.invisibility_of_element_located((By.CSS_SELECTOR, css_selector)))
 
-    def until_invisibility_of_element_located_by_link_text(self, ele=None, timeout=10, link_text=''):
+    def until_invisibility_of_element_located_by_link_text(self, link_text:str, ele=None, timeout=10):
         """
         判断某个元素在是否存在于dom或不可见,如果可见返回False,不可见返回这个元素
         :param ele:WebElement
@@ -946,12 +1003,9 @@ class Driver(object):
         """
         if not ele:
             ele = self.driver
-        if not link_text:
-            self.error_log(e='link_text为空!!!')
-            return None
         return WebDriverWait(ele, timeout).until(EC.invisibility_of_element_located((By.LINK_TEXT, link_text)))
 
-    def until_invisibility_of_element_located_by_partial_link_text(self, ele=None, timeout=10, partial_link_text=''):
+    def until_invisibility_of_element_located_by_partial_link_text(self, partial_link_text:str, ele=None, timeout=10):
         """
         判断某个元素在是否存在于dom或不可见,如果可见返回False,不可见返回这个元素
         :param ele:WebElement
@@ -961,12 +1015,9 @@ class Driver(object):
         """
         if not ele:
             ele = self.driver
-        if not partial_link_text:
-            self.error_log(e='partial_link_text为空!!!')
-            return None
         return WebDriverWait(ele, timeout).until(EC.invisibility_of_element_located((By.LINK_TEXT, partial_link_text)))
 
-    def until_element_to_be_clickable_by_id(self, ele=None, timeout=10, id=''):
+    def until_element_to_be_clickable_by_id(self, id:str, ele=None, timeout=10):
         """
         判断某个元素中是否可见并且是enable的，代表可点击
         :param ele:WebElement
@@ -976,12 +1027,9 @@ class Driver(object):
         """
         if not ele:
             ele = self.driver
-        if not id:
-            self.error_log(e='id为空!!!')
-            return None
         return WebDriverWait(ele, timeout).until(EC.element_to_be_clickable((By.ID, id)))
 
-    def until_element_to_be_clickable_by_css_selector(self, ele=None, timeout=10, css_selector=''):
+    def until_element_to_be_clickable_by_css_selector(self, css_selector:str, ele=None, timeout=10):
         """
         判断某个元素中是否可见并且是enable的，代表可点击
         :param ele:WebElement
@@ -991,12 +1039,9 @@ class Driver(object):
         """
         if not ele:
             ele = self.driver
-        if not css_selector:
-            self.error_log(e='css_selector为空!!!')
-            return None
         return WebDriverWait(ele, timeout).until(EC.element_to_be_clickable((By.CSS_SELECTOR, css_selector)))
 
-    def until_element_to_be_clickable_by_link_text(self, ele=None, timeout=10, link_text=''):
+    def until_element_to_be_clickable_by_link_text(self, link_text:str, ele=None, timeout=10):
         """
         判断某个元素中是否可见并且是enable的，代表可点击
         :param ele:WebElement
@@ -1006,12 +1051,9 @@ class Driver(object):
         """
         if not ele:
             ele = self.driver
-        if not link_text:
-            self.error_log(e='link_text为空!!!')
-            return None
         return WebDriverWait(ele, timeout).until(EC.element_to_be_clickable((By.LINK_TEXT, link_text)))
 
-    def until_element_to_be_clickable_by_partial_link_text(self, ele=None, timeout=10, link_text=''):
+    def until_element_to_be_clickable_by_partial_link_text(self, link_text:str, ele=None, timeout=10):
         """
         判断某个元素中是否可见并且是enable的，代表可点击
         :param ele:WebElement
@@ -1021,12 +1063,9 @@ class Driver(object):
         """
         if not ele:
             ele = self.driver
-        if not link_text:
-            self.error_log(e='link_text为空!!!')
-            return None
         return WebDriverWait(ele, timeout).until(EC.element_to_be_clickable((By.PARTIAL_LINK_TEXT, link_text)))
 
-    def until_staleness_of_by_id(self, ele=None, timeout=10, id=''):
+    def until_staleness_of_by_id(self, id:str, ele=None, timeout=10):
         """
         等待某个元素从dom树中移除
         :param ele:WebElement
@@ -1036,12 +1075,9 @@ class Driver(object):
         """
         if not ele:
             ele = self.driver
-        if not id:
-            self.error_log(e='id为空!!!')
-            return None
         return WebDriverWait(ele, timeout).until(EC.staleness_of((By.ID, id)))
 
-    def until_staleness_of_by_css_selector(self, ele=None, timeout=10, css_selector=''):
+    def until_staleness_of_by_css_selector(self, css_selector:str, ele=None, timeout=10):
         """
         等待某个元素从dom树中移除
         :param ele:WebElement
@@ -1051,12 +1087,9 @@ class Driver(object):
         """
         if not ele:
             ele = self.driver
-        if not css_selector:
-            self.error_log(e='css_selector为空!!!')
-            return None
         return WebDriverWait(ele, timeout).until(EC.staleness_of((By.CSS_SELECTOR, css_selector)))
 
-    def until_staleness_of_by_link_text(self, ele=None, timeout=10, link_text=''):
+    def until_staleness_of_by_link_text(self, link_text:str, ele=None, timeout=10):
         """
         等待某个元素从dom树中移除
         :param ele:WebElement
@@ -1066,12 +1099,9 @@ class Driver(object):
         """
         if not ele:
             ele = self.driver
-        if not link_text:
-            self.error_log(e='link_text为空!!!')
-            return None
         return WebDriverWait(ele, timeout).until(EC.staleness_of((By.LINK_TEXT, link_text)))
 
-    def until_staleness_of_by_partial_link_text(self, ele=None, timeout=10, link_text=''):
+    def until_staleness_of_by_partial_link_text(self, link_text:str, ele=None, timeout=10):
         """
         等待某个元素从dom树中移除
         :param ele:WebElement
@@ -1081,12 +1111,9 @@ class Driver(object):
         """
         if not ele:
             ele = self.driver
-        if not link_text:
-            self.error_log(e='link_text为空!!!')
-            return None
         return WebDriverWait(ele, timeout).until(EC.staleness_of((By.PARTIAL_LINK_TEXT, link_text)))
 
-    def until_element_to_be_selected_by_id(self, ele=None, timeout=10, id=''):
+    def until_element_to_be_selected_by_id(self, id:str, ele=None, timeout=10):
         """
         判断某个元素是否被选中了,一般用在下拉列表
         :param ele:WebElement
@@ -1096,12 +1123,9 @@ class Driver(object):
         """
         if not ele:
             ele = self.driver
-        if not id:
-            self.error_log(e='id为空!!!')
-            return None
         return WebDriverWait(ele, timeout).until(EC.element_to_be_selected((By.ID, id)))
 
-    def until_element_to_be_selected_by_css_selector(self, ele=None, timeout=10, css_selector=''):
+    def until_element_to_be_selected_by_css_selector(self, css_selector:str, ele=None, timeout=10):
         """
         判断某个元素是否被选中了,一般用在下拉列表
         :param ele:WebElement
@@ -1111,12 +1135,9 @@ class Driver(object):
         """
         if not ele:
             ele = self.driver
-        if not css_selector:
-            self.error_log(e='css_selector为空!!!')
-            return None
         return WebDriverWait(ele, timeout).until(EC.element_to_be_selected((By.CSS_SELECTOR, css_selector)))
 
-    def until_element_to_be_selected_by_link_text(self, ele=None, timeout=10, link_text=''):
+    def until_element_to_be_selected_by_link_text(self, link_text:str, ele=None, timeout=10):
         """
         判断某个元素是否被选中了,一般用在下拉列表
         :param ele:WebElement
@@ -1126,12 +1147,9 @@ class Driver(object):
         """
         if not ele:
             ele = self.driver
-        if not link_text:
-            self.error_log(e='link_text为空!!!')
-            return None
         return WebDriverWait(ele, timeout).until(EC.element_to_be_selected((By.LINK_TEXT, link_text)))
 
-    def until_element_to_be_selected_by_partial_link_text(self, ele=None, timeout=10, link_text=''):
+    def until_element_to_be_selected_by_partial_link_text(self, link_text:str, ele=None, timeout=10):
         """
         判断某个元素是否被选中了,一般用在下拉列表
         :param ele:WebElement
@@ -1141,12 +1159,9 @@ class Driver(object):
         """
         if not ele:
             ele = self.driver
-        if not link_text:
-            self.error_log(e='link_text为空!!!')
-            return None
         return WebDriverWait(ele, timeout).until(EC.element_to_be_selected((By.PARTIAL_LINK_TEXT, link_text)))
 
-    def until_element_selection_state_to_be_by_id(self, ele=None, timeout=10, id='', status=True):
+    def until_element_selection_state_to_be_by_id(self, id:str, ele=None, timeout=10, status=True):
         """
         判断某个元素的选中状态是否符合预期
         :param ele:WebElement
@@ -1157,12 +1172,9 @@ class Driver(object):
         """
         if not ele:
             ele = self.driver
-        if not id:
-            self.error_log(e='id为空!!!')
-            return None
         return WebDriverWait(ele, timeout).until(EC.element_selection_state_to_be((By.ID, id),status))
 
-    def until_element_selection_state_to_be_by_css_selector(self, ele=None, timeout=10, css_selector='', status=True):
+    def until_element_selection_state_to_be_by_css_selector(self, css_selector:str, ele=None, timeout=10, status=True):
         """
         判断某个元素的选中状态是否符合预期
         :param ele:WebElement
@@ -1173,12 +1185,9 @@ class Driver(object):
         """
         if not ele:
             ele = self.driver
-        if not css_selector:
-            self.error_log(e='css_selector为空!!!')
-            return None
         return WebDriverWait(ele, timeout).until(EC.element_selection_state_to_be((By.CSS_SELECTOR, css_selector),status))
 
-    def until_element_selection_state_to_be_by_link_text(self, ele=None, timeout=10, link_text='', status=True):
+    def until_element_selection_state_to_be_by_link_text(self, link_text:str, ele=None, timeout=10, status=True):
         """
         判断某个元素的选中状态是否符合预期
         :param ele:WebElement
@@ -1189,12 +1198,9 @@ class Driver(object):
         """
         if not ele:
             ele = self.driver
-        if not link_text:
-            self.error_log(e='link_text为空!!!')
-            return None
         return WebDriverWait(ele, timeout).until(EC.element_selection_state_to_be((By.LINK_TEXT, link_text),status))
 
-    def until_element_selection_state_to_be_by_partial_link_text(self, ele=None, timeout=10, link_text='', status=True):
+    def until_element_selection_state_to_be_by_partial_link_text(self, link_text:str, ele=None, timeout=10, status=True):
         """
         判断某个元素的选中状态是否符合预期
         :param ele:WebElement
@@ -1205,12 +1211,9 @@ class Driver(object):
         """
         if not ele:
             ele = self.driver
-        if not link_text:
-            self.error_log(e='link_text为空!!!')
-            return None
         return WebDriverWait(ele, timeout).until(EC.element_selection_state_to_be((By.PARTIAL_LINK_TEXT, link_text),status))
 
-    def until_element_located_selection_state_to_be_by_id(self, ele=None, timeout=10, id='', status=True):
+    def until_element_located_selection_state_to_be_by_id(self, id:str, ele=None, timeout=10, status=True):
         """
         判断某个元素的选中状态是否符合预期
         :param ele:WebElement
@@ -1221,12 +1224,9 @@ class Driver(object):
         """
         if not ele:
             ele = self.driver
-        if not id:
-            self.error_log(e='id为空!!!')
-            return None
         return WebDriverWait(ele, timeout).until(EC.element_located_selection_state_to_be((By.ID, id),status))
 
-    def until_element_located_selection_state_to_be_by_css_selector(self, ele=None, timeout=10, css_selector='', status=True):
+    def until_element_located_selection_state_to_be_by_css_selector(self, css_selector:str, ele=None, timeout=10, status=True):
         """
         判断某个元素的选中状态是否符合预期
         :param ele:WebElement
@@ -1237,12 +1237,9 @@ class Driver(object):
         """
         if not ele:
             ele = self.driver
-        if not css_selector:
-            self.error_log(e='css_selector为空!!!')
-            return None
         return WebDriverWait(ele, timeout).until(EC.element_located_selection_state_to_be((By.CSS_SELECTOR, css_selector),status))
 
-    def until_element_located_selection_state_to_be_by_link_text(self, ele=None, timeout=10, link_text='', status=True):
+    def until_element_located_selection_state_to_be_by_link_text(self, link_text:str, ele=None, timeout=10, status=True):
         """
         判断某个元素的选中状态是否符合预期
         :param ele:WebElement
@@ -1253,12 +1250,9 @@ class Driver(object):
         """
         if not ele:
             ele = self.driver
-        if not link_text:
-            self.error_log(e='link_text为空!!!')
-            return None
         return WebDriverWait(ele, timeout).until(EC.element_located_selection_state_to_be((By.LINK_TEXT, link_text),status))
 
-    def until_element_located_selection_state_to_be_by_partial_link_text(self, ele=None, timeout=10, link_text='', status=True):
+    def until_element_located_selection_state_to_be_by_partial_link_text(self, link_text:str, ele=None, timeout=10, status=True):
         """
         判断某个元素的选中状态是否符合预期
         :param ele:WebElement
@@ -1269,9 +1263,6 @@ class Driver(object):
         """
         if not ele:
             ele = self.driver
-        if not link_text:
-            self.error_log(e='link_text为空!!!')
-            return None
         return WebDriverWait(ele, timeout).until(EC.element_located_selection_state_to_be((By.PARTIAL_LINK_TEXT, link_text),
                                                                                           status))
 
@@ -1286,7 +1277,7 @@ class Driver(object):
             ele = self.driver
         return WebDriverWait(ele, timeout).until(EC.alert_is_present())
 
-    def ismore_by_scroll_page_judge_by_len(self, css_selector, min_offset=1000, max_offset=5000, comment_len=0):
+    def until_ismore_by_scroll_page_judge_by_len(self, css_selector:str, min_offset=1000, max_offset=5000, comment_len=0):
         """
         通过长度判断页面是否有更多
         :param css_selector:
@@ -1313,7 +1304,7 @@ class Driver(object):
                     break
         self.logger.info('...结束下拉页面...')
 
-    def until_ismore_by_send_key_arrow_down_judge_by_len(self, list_css_selector='', ele_css_selector='', min_frequency=100, max_frequency=300, comment_len=0, timeout=1):
+    def until_ismore_by_send_key_arrow_down_judge_by_len(self, list_css_selector:str, ele_css_selector:str, min_frequency=100, max_frequency=300, comment_len=0, timeout=1):
         """
         通过长度判断页面是否有更多
         :param list_css_selector:列表的css样式
@@ -1324,12 +1315,6 @@ class Driver(object):
         :param timeout:
         :return:
         """
-        if not list_css_selector:
-            self.error_log(e='list_css_selector不可以为空!!!')
-            return None
-        if not ele_css_selector:
-            self.error_log(e='ele_css_selector不可以为空!!!')
-            return None
         self.info_log(data='...开始下拉页面...')
         while (True):
             list_len = self.until_get_elements_len_by_css_selector(css_selector=list_css_selector,timeout=timeout)
@@ -1349,19 +1334,20 @@ class Driver(object):
                     break
         self.logger.info('...结束下拉页面...')
 
-    def until_click_by_vertical_scroll_page_down_by_css_selector(self, ele=None, css_selector='', offset=8, try_times=20):
+    def until_click_by_vertical_scroll_page_down_by_css_selector(self, css_selector:str, ele=None, offset=8, try_times=20):
         """
-
+        Deprecated use until_click_by_css_selector
         :param ele:
         :param click_css_selector:
         :param offset:
         :param try_times:
         :return:
         """
+        warnings.warn("use until_click_by_css_selector instead", DeprecationWarning)
         failed_times = 0
         click_ele = self.until_presence_of_element_located_by_css_selector(ele=ele, css_selector=css_selector)
         while(True):
-            self.scroll_into_view(ele=click_ele)
+            self.scroll_to_center(ele=click_ele)
             if failed_times > try_times:
                 break
             try:
@@ -1373,17 +1359,18 @@ class Driver(object):
                 self.warning_log(e='...正在尝试第%s次点击...'%failed_times)
                 self.vertical_scroll_by(offset=offset)
 
-    def until_click_by_vertical_scroll_page_down(self, click_ele=None, offset=8, try_times=20):
+    def until_click_by_vertical_scroll_page_down(self, click_ele:WebElement, offset=8, try_times=20):
         """
-
+        Deprecated use until_click
         :param ele:
         :param offset:
         :param try_times:
         :return:
         """
+        warnings.warn("use until_click instead", DeprecationWarning)
         failed_times = 0
         while(True):
-            self.scroll_into_view(ele=click_ele)
+            self.scroll_to_center(ele=click_ele)
             if failed_times > try_times:
                 break
             try:
@@ -1395,9 +1382,9 @@ class Driver(object):
                 self.warning_log(e='...正在尝试第%s次点击...'%failed_times)
                 self.vertical_scroll_by(offset=offset)
 
-    def until_presence_by_vertical_scroll_page_down_by_css_selector(self, ele=None, css_selector='', offset=8, try_times=20, timeout=1):
+    def until_presence_by_vertical_scroll_page_down_by_css_selector(self, css_selector:str, ele=None, offset=8, try_times=20, timeout=1):
         """
-
+        Deprecated use until_scroll_element_to_center_by_css_selector
         :param ele:WebElement
         :param css_selector:
         :param offset:
@@ -1405,9 +1392,7 @@ class Driver(object):
         :param timeout:
         :return:
         """
-        if not css_selector:
-            self.error_log(e='css_selector不允许为空!!!')
-            return None
+        warnings.warn("use until_scroll_element_to_center_by_css_selector instead", DeprecationWarning)
         if not ele:
             ele = self.driver
         failed_times = 0
@@ -1415,7 +1400,7 @@ class Driver(object):
             if failed_times > try_times:
                 break
             try:
-                self.until_presence_of_element_located_by_css_selector(ele=ele,css_selector=css_selector,timeout=float(timeout)/10)
+                self.until_presence_of_element_located_by_css_selector(ele=ele,css_selector=css_selector,timeout=int((timeout)/10))
                 self.info_log(data='元素存在,可以访问')
                 break
             except Exception:
@@ -1423,17 +1408,15 @@ class Driver(object):
                 self.warning_log(e='...正在尝试第%s次下拉...'%failed_times)
                 self.vertical_scroll_by(offset=offset)
 
-    def until_refresh_by_css_selector(self, css_selector='', try_times=10):
+    def until_refresh_by_css_selector(self, css_selector:str, try_times=10):
         """
-
+        Deprecated use
         :param css_selector:
         :param try_times:
         :return:
         """
+        warnings.warn("use instead", DeprecationWarning)
         count = 0
-        if not css_selector:
-            self.error_log(e='css_selector不可以为空!!!')
-            return None
         for i in range(try_times):
             try:
                 self.until_presence_of_element_located_by_css_selector(css_selector=css_selector,timeout=1)
@@ -1442,55 +1425,33 @@ class Driver(object):
                 self.info_log(data='第%s次刷新!!!'%count)
                 self.driver.refresh()
 
-    def until_click_no_next_page_by_css_selector(self, func=None, css_selector='', timeout=1, pause_time=1, is_next=True, is_debug=False, current_css_selector='', nocurrent_css_selector='', **kwargs):
+    def until_click_no_next_page_by_css_selector(self, css_selector:str, func=None, timeout=1, pause_time=1, is_next=True, is_debug=False, **kwargs):
         """
         根据css样式点击直到没有下一页
-        :param func:
         :param css_selector:
+        :param func:
         :param timeout:
         :param pause_time:
         :param is_next:专门用来测试的时候使用,表示是否点击下一页
         :param is_debug:出错时候，是否停止
-        :param current_css_selector:当前页的css选择器
         :param kwargs:
         :return:
         """
         def empty_func(**kwargs):
             pass
-        if not css_selector:
-            self.error_log(e='css_selector不可以为空!!!')
-            raise ValueError
         if not func:
             func = empty_func
             self.warning_log(e='当前func为空,没有什么操作需要执行!!!')
         count = 0
-        pre_page = 0
         while(True):
             count += 1
-            if current_css_selector:#如果存在当前页页码的样式
-                if not nocurrent_css_selector:#必须要有结束标志
-                    raise ValueError
-                self.focus_on_element_by_css_selector(css_selector=current_css_selector)
-                current_page = int(self.until_presence_of_element_located_by_css_selector(css_selector=current_css_selector).text)
-                if pre_page == current_page:
-                    try:
-                        self.until_presence_of_element_located_by_css_selector(css_selector=nocurrent_css_selector)
-                        self.info_log(data='没有下一页了!!!')
-                        break
-                    except Exception:
-                        self.focus_on_element_by_css_selector(css_selector=css_selector)
-                        time.sleep(1)
-                        self.until_click_by_css_selector(css_selector=css_selector, timeout=timeout)
-                pre_page = current_page
             self.info_log(data='当前翻到第%s页...' % count)
+            func(**kwargs)
+            if not is_next:  # 在调试的时候不需要下一页
+                break
             time.sleep(pause_time)
             try:
-                func(**kwargs)
-                if not is_next:#在调试的时候不需要下一页
-                    break
-                self.focus_on_element_by_css_selector(css_selector=css_selector)
-                time.sleep(1)
-                self.until_click_by_css_selector(css_selector=css_selector,timeout=timeout)
+                self.until_scroll_to_center_click_by_css_selector(css_selector=css_selector,timeout=timeout)
             except Exception as e:
                 if is_debug:
                     self.debug_log(data='程序点击下一页出错,已经暂停程序,请检查出错的原因!!!')
@@ -1499,11 +1460,11 @@ class Driver(object):
                 self.error_log(e=str(e)+'\n没有下一页了!!!',istraceback=False)
                 break
 
-    def until_click_no_next_page_by_partial_link_text(self, func=None, link_text='', timeout=1, pause_time=1, is_next=True, **kwargs):
+    def until_click_no_next_page_by_partial_link_text(self, link_text:str, func=None, timeout=1, pause_time=1, is_next=True, **kwargs):
         """
         根据链接文字点击直到没有下一页
-        :param func:
         :param link_text:
+        :param func:
         :param timeout:
         :param pause_time:
         :param is_next:
@@ -1512,9 +1473,6 @@ class Driver(object):
         """
         def empty_func(**kwargs):
             pass
-        if not link_text:
-            self.error_log(e='link_text不可以为空!!!')
-            raise ValueError
         if not func:
             func = empty_func
             self.warning_log(e='当前func为空,没有什么操作需要执行!!!')
@@ -1522,13 +1480,12 @@ class Driver(object):
         while(True):
             count += 1
             self.info_log(data='当前翻到第%s页...' % count)
+            func(**kwargs)
+            if not is_next:  # 在调试的时候不需要下一页
+                break
             time.sleep(pause_time)
             try:
-                func(**kwargs)
-                if not is_next:#在调试的时候不需要下一页
-                    break
-                self.focus_on_element_by_partial_link_text(link_text=link_text)
-                self.until_click_by_partial_link_text(link_text=link_text,timeout=timeout)
+                self.until_scroll_to_center_click_by_partial_link_text(link_text=link_text,timeout=timeout)
             except Exception as e:
                 self.error_log(e=str(e) + '\n没有下一页了!!!', istraceback=False)
                 break
@@ -1542,27 +1499,20 @@ class Driver(object):
         self.driver.close()
         self.driver.switch_to.window(self.driver.window_handles[-1])
 
-    def switch_window_by_index(self,index=None):
+    def switch_window_by_index(self,index:int):
         """
         根据索引切换浏览器窗口
         :param index:
         :return:
         """
-        if not index:
-            self.error_log(e='index不可以为空!!!')
-            return None
         self.driver.switch_to.window(self.driver.window_handles[index])
 
-    def until_select_by_visible_text_by_css_selector(self, ele=None, css_selector='', text=''):
-        if not css_selector or not text:
-            self.error_log(e='css_selector和text都不可以为空!!!')
-        s = Select(self.until_presence_of_element_located_by_css_selector(ele=ele, css_selector=css_selector))
+    def until_scroll_to_center_select_by_visible_text_by_css_selector(self, css_selector:str, text:str, ele=None):
+        s = Select(self.until_scroll_to_center_presence_of_element_located_by_css_selector(ele=ele, css_selector=css_selector))
         s.select_by_visible_text(text)
 
-    def until_select_by_value_by_css_selector(self, ele=None, css_selector='', value=''):
-        if not css_selector or not value:
-            self.error_log(e='css_selector和value都不可以为空!!!')
-        s = Select(self.until_presence_of_element_located_by_css_selector(ele=ele, css_selector=css_selector))
+    def until_scroll_to_center_select_by_value_by_css_selector(self, css_selector:str, value:str, ele=None):
+        s = Select(self.until_scroll_to_center_presence_of_element_located_by_css_selector(ele=ele, css_selector=css_selector))
         s.select_by_value(value)
 
 
@@ -1575,16 +1525,13 @@ class Driver(object):
         """
         return self.data_key
 
-    def get_current_data_list_from_mongodb(self, collection=None, *keys):
+    def get_current_data_list_from_mongodb(self, collection:Collection, *keys):
         """
         获取当前的爬虫数据,以列表形式返回
         :param collection:
         :param keys:表示要保留的关键字
         :return:
         """
-        if not collection:
-            self.error_log(e='目标数据库不可以为空!!!')
-            return None
         if keys:
             data_list = []
             for data in collection.find(self.get_data_key()):
@@ -1596,18 +1543,15 @@ class Driver(object):
         else:
             return list(collection.find(self.get_data_key()))
 
-    def get_current_data_from_mongodb(self, collection=None, other_key=None):
+    def get_current_data_from_mongodb(self, collection:Collection, other_key={}):
         """
         获取当前的爬虫数据,以字典形式返回
         :param collection:
         :param other_key:
         :return:
         """
-        if not collection or not other_key:
-            self.error_log(e='目标数据库或者关键字不可以为空!!!')
-            return None
         key = self.merge_dict(other_key,self.get_data_key())
-        return collection.find(key)[0]
+        return collection.find(key)[0]#由于返回的是一个长度为1的列表
 
     def save_data_list_to_mongodb(self, fieldlist=Fieldlist(), mongodb=Mongodb(), datalist=[]):
         """
@@ -1717,32 +1661,24 @@ class Driver(object):
         self.debug_log(data='随机时间为:%s'%pause_time)
         return pause_time
 
-    def get_key_str_field_by_css_selector(self, field=Field(), ele=None):
+    def get_key_str_field_by_css_selector(self, field:Field, ele=None):
         """
         获得条目的关键字段
         :param field:
         :param ele:WebElement
         :return:
         """
-        if field.fieldvalue:#如果已经有爬虫的值
-            return field.fieldvalue
         time.sleep(field.pause_time)
         try:
             if ele and field.css_selector:
-                self.until_presence_by_vertical_scroll_page_down_by_css_selector(
-                    ele=ele,css_selector=field.css_selector,offset=field.offset,timeout=field.timeout,try_times=field.try_times)
-                ele = self.until_presence_of_element_located_by_css_selector(ele=ele,css_selector=field.css_selector,timeout=field.timeout)
+                ele = self.until_scroll_to_center_presence_of_element_located_by_css_selector(ele=ele,css_selector=field.css_selector,timeout=field.timeout)
             elif ele and not field.css_selector:
                 ele = ele
             elif not ele and field.css_selector:
-                self.until_presence_by_vertical_scroll_page_down_by_css_selector(
-                    css_selector=field.css_selector,offset=field.offset,timeout=field.timeout,try_times=field.try_times)
-                ele = self.until_presence_of_element_located_by_css_selector(css_selector=field.css_selector,timeout=field.timeout)
+                ele = self.until_scroll_to_center_presence_of_element_located_by_css_selector(css_selector=field.css_selector,timeout=field.timeout)
             else:
                 self.error_log(name=field.fieldname,e='未指定样式选择器和目标元素,无法取得该字段内容!!!')
-                return
-            ActionChains(self.driver).move_to_element(ele).perform()
-            self.focus_on_element(ele=ele)
+                raise ValueError
             if field.attr:
                 _str = ele.get_attribute(field.attr)
             else:
@@ -1759,32 +1695,24 @@ class Driver(object):
         self.info_log(name=field.fieldname, data=_str)
         return _str
 
-    def get_str_field_by_css_selector(self, field=Field(), ele=None):
+    def get_str_field_by_css_selector(self, field:Field, ele=None):
         """
         获取条目的字符串字段
         :param field:
         :param ele:WebElement
         :return:
         """
-        if field.fieldvalue:#如果已经有爬虫的值
-            return field.fieldvalue
         time.sleep(field.pause_time)
         try:
             if ele and field.css_selector:
-                self.until_presence_by_vertical_scroll_page_down_by_css_selector(
-                    ele=ele,css_selector=field.css_selector,offset=field.offset,timeout=field.timeout,try_times=field.try_times)
-                ele = self.until_presence_of_element_located_by_css_selector(ele=ele,css_selector=field.css_selector,timeout=field.timeout)
+                ele = self.until_scroll_to_center_presence_of_element_located_by_css_selector(ele=ele,css_selector=field.css_selector,timeout=field.timeout)
             elif ele and not field.css_selector:
                 ele = ele
             elif not ele and field.css_selector:
-                self.until_presence_by_vertical_scroll_page_down_by_css_selector(
-                    css_selector=field.css_selector,offset=field.offset,timeout=field.timeout,try_times=field.try_times)
-                ele = self.until_presence_of_element_located_by_css_selector(css_selector=field.css_selector,timeout=field.timeout)
+                ele = self.until_scroll_to_center_presence_of_element_located_by_css_selector(css_selector=field.css_selector,timeout=field.timeout)
             else:
                 self.error_log(name=field.fieldname, e='未指定样式选择器和目标元素,无法取得该字段内容!!!')
-                return
-            ActionChains(self.driver).move_to_element(ele).perform()
-            self.focus_on_element(ele=ele)
+                raise ValueError
             if field.attr:
                 _str = ele.get_attribute(field.attr)
             else:
@@ -1801,15 +1729,13 @@ class Driver(object):
         self.info_log(name=field.fieldname, data=_str)
         return _str
 
-    def get_str_list_field_by_css_selector(self, field=Field(), ele=None):
+    def get_str_list_field_by_css_selector(self, field:Field, ele=None):
         """
         获取条目的字符串列表字段
         :param field:
         :param ele:WebElement
         :return:
         """
-        if field.fieldvalue:#如果已经有爬虫的值
-            return field.fieldvalue
         time.sleep(field.pause_time)
         _list = []
         try:
@@ -1828,32 +1754,24 @@ class Driver(object):
         self.info_log(name=field.fieldname, data=json.dumps(_list))
         return _list
 
-    def get_int_field_by_css_selector(self, field=Field(), ele=None):
+    def get_int_field_by_css_selector(self, field:Field, ele=None):
         """
         获取整型的字段
         :param field:
         :param ele:WebElement
         :return:
         """
-        if field.fieldvalue:#如果已经有爬虫的值
-            return field.fieldvalue
         time.sleep(field.pause_time)
         try:
             if ele and field.css_selector:
-                self.until_presence_by_vertical_scroll_page_down_by_css_selector(
-                    ele=ele,css_selector=field.css_selector,offset=field.offset,timeout=field.timeout,try_times=field.try_times)
-                ele = self.until_presence_of_element_located_by_css_selector(ele=ele,css_selector=field.css_selector,timeout=field.timeout)
+                ele = self.until_scroll_to_center_presence_of_element_located_by_css_selector(ele=ele,css_selector=field.css_selector,timeout=field.timeout)
             elif ele and not field.css_selector:
                 ele = ele
             elif not ele and field.css_selector:
-                self.until_presence_by_vertical_scroll_page_down_by_css_selector(
-                    css_selector=field.css_selector,offset=field.offset,timeout=field.timeout,try_times=field.try_times)
-                ele = self.until_presence_of_element_located_by_css_selector(css_selector=field.css_selector,timeout=field.timeout)
+                ele = self.until_scroll_to_center_presence_of_element_located_by_css_selector(css_selector=field.css_selector,timeout=field.timeout)
             else:
                 self.error_log(name=field.fieldname, e='未指定样式选择器和目标元素,无法取得该字段内容!!!')
-                return
-            ActionChains(self.driver).move_to_element(ele).perform()
-            self.focus_on_element(ele=ele)
+                raise ValueError
             if field.attr:
                 _str = ele.get_attribute(field.attr)
             else:
@@ -1871,32 +1789,24 @@ class Driver(object):
         self.info_log(name=field.fieldname, data=str(_int))
         return _int
 
-    def get_float_field_by_css_selector(self, field=Field(), ele=None):
+    def get_float_field_by_css_selector(self, field:Field, ele=None):
         """
         获取浮点型的字段
         :param field:
         :param ele:WebElement
         :return:
         """
-        if field.fieldvalue:#如果已经有爬虫的值
-            return field.fieldvalue
         time.sleep(field.pause_time)
         try:
             if ele and field.css_selector:
-                self.until_presence_by_vertical_scroll_page_down_by_css_selector(
-                    ele=ele,css_selector=field.css_selector,offset=field.offset,timeout=field.timeout,try_times=field.try_times)
-                ele = self.until_presence_of_element_located_by_css_selector(ele=ele,css_selector=field.css_selector, timeout=field.timeout)
+                ele = self.until_scroll_to_center_presence_of_element_located_by_css_selector(ele=ele,css_selector=field.css_selector, timeout=field.timeout)
             elif ele and not field.css_selector:
                 ele = ele
             elif not ele and field.css_selector:
-                self.until_presence_by_vertical_scroll_page_down_by_css_selector(
-                    css_selector=field.css_selector,offset=field.offset,timeout=field.timeout,try_times=field.try_times)
-                ele = self.until_presence_of_element_located_by_css_selector(css_selector=field.css_selector, timeout=field.timeout)
+                ele = self.until_scroll_to_center_presence_of_element_located_by_css_selector(css_selector=field.css_selector, timeout=field.timeout)
             else:
                 self.error_log(name=field.fieldname, e='未指定样式选择器和目标元素,无法取得该字段内容!!!')
-                return
-            ActionChains(self.driver).move_to_element(ele).perform()
-            self.focus_on_element(ele=ele)
+                raise ValueError
             if field.attr:
                 _str = ele.get_attribute(field.attr)
             else:
@@ -1914,7 +1824,7 @@ class Driver(object):
         self.info_log(name=field.fieldname, data=str(_float))
         return _float
 
-    def run_new_tab_task(self, try_times=15, pause_time=1, name='', url='', func=None, **kwargs):
+    def run_new_tab_task(self, url:str, name='', try_times=15, pause_time=1, func=None, **kwargs):
         """
         运行一个新建标签页的任务(默认根据url打开标签页)
         :param try_times:
@@ -1930,9 +1840,6 @@ class Driver(object):
         if not func:
             func = empty_func
             self.warning_log(name=name, e='标签页任务里面没有具体要执行的内容!!!')
-        if not url:
-            self.error_log(name=name,e='标签页任务里面没有具体要打开的url!!!')
-            raise ValueError
         if not self.fast_new_page(url,try_times=try_times):
             return None
         time.sleep(pause_time)
@@ -1941,7 +1848,7 @@ class Driver(object):
         self.driver.switch_to.window(self.driver.window_handles[-1])
         return data
 
-    def run_click_tab_task(self, ele=None, try_times=15, pause_time=1, name='', click_css_selector='', func=None, page_func=None, **kwargs):
+    def run_click_tab_task(self, click_css_selector:str, ele=None, try_times=15, pause_time=1, name='', func=None, page_func=None, **kwargs):
         """
         运行一个点击出来的标签页的任务(通过按钮点击打开标签页)
         :param ele:
@@ -1960,9 +1867,6 @@ class Driver(object):
         if not func:
             self.warning_log(name=name, e='标签页任务里面没有具体要执行的内容!!!')
             func = empty_func
-        if not click_css_selector:
-            self.error_log(name=name,e='click_css_selector不可以为空!!!')
-            raise ValueError
         if not self.fast_click_page_by_css_selector(click_css_selector=click_css_selector, ele=ele, try_times=try_times):
             return None
         time.sleep(pause_time)
@@ -1974,16 +1878,15 @@ class Driver(object):
         self.driver.switch_to.window(self.driver.window_handles[-1])
         return data
 
-    def select_Field_by_css_selector(self, field=Field(), ele=None):
+    def select_Field_by_css_selector(self, field:Field, ele=None):
         """
         根据css选择器来得到每个字段对应的值
         :param field:
         :param ele:WebElement
         :return:
         """
-        if field == None:
-            self.error_log(e='field不可以为空!!!')
-            raise ValueError
+        if field.is_isolated:#如果字段孤立则,把基础页面元素置为driver
+            ele = self.driver
         if field.fieldtype == FieldType.KEY_STR:
             return self.get_key_str_field_by_css_selector(ele=ele,field=field)
         elif field.fieldtype == FieldType.STR:
@@ -1995,15 +1898,12 @@ class Driver(object):
         elif field.fieldtype == FieldType.FLOAT:
             return self.get_float_field_by_css_selector(ele=ele,field=field)
 
-    def from_page_get_data_list(self, page=Page()):
+    def from_page_get_data_list(self, page:Page):
         """
         从页面爬取一个数据列表
         :param page:爬虫页面
         :return:
         """
-        if page == None:
-            self.error_log(e='page不可以为空!!!')
-            raise ValueError
         self.info_log(data=page.name)
         data_list = list()
         if page.listcssselector == None:
@@ -2038,7 +1938,7 @@ class Driver(object):
             self.error_log(e=str(e))
         return data_list
 
-    def from_fieldlist_get_data(self, page=Page(), ele=None):
+    def from_fieldlist_get_data(self, page:Page, ele=None):
         """
         从字段列表获取数据
         :param page:爬虫页面
@@ -2056,7 +1956,7 @@ class Driver(object):
             data.setdefault(field.fieldname, d)
         return data
 
-    def from_page_add_data_to_data_list(self, page=Page(), data_list=list(), pre_page=Page(), page_func=None):
+    def from_page_add_data_to_data_list(self, page:Page, pre_page:Page, data_list=list(), page_func=None, extra_page_func=None):
         """
         把当前页面的数据再次添加到之前的页面里面
         :param page:爬虫页面
@@ -2065,9 +1965,6 @@ class Driver(object):
         :param page_func:页面上面执行操作
         :return:
         """
-        if page == None or pre_page == None:
-            self.error_log(e='page或pre_page不可以为空!!!')
-            raise ValueError
         #整合fieldlist
         fieldlist_merge = Fieldlist()
         for field in page.fieldlist:
@@ -2096,6 +1993,11 @@ class Driver(object):
                         self.save_data_to_mongodb(fieldlist=fieldlist_merge, mongodb=page.mongodb, data=data_list_tmp[i])#注意关键字段必定出现在前面一页
                     else:
                         self.warning_log(e='field的fieldname的命名可能出现了重复,请检查!!!')
+        def empty_func():
+            pass
+        if not extra_page_func:
+            extra_page_func = empty_func
+        extra_page_func()
         return data_list_tmp
 
     def run_spider(self):
@@ -2108,13 +2010,13 @@ class Driver(object):
     def start_session(self):
         self.driver.start_session(
             capabilities={'browserName': 'chrome',
-                          'goog:chromeOptions': {'extensions': [], 'args': [self.curr_user_agent]}, 'platform': 'ANY',
+                          'goog:chromeOptions': {'extensions': [], 'args': [self.curr_user_agent, 'disable-infobars']}, 'platform': 'ANY',
                           'version': ''})
 
     def start_headless_session(self):
         self.driver.start_session(
             capabilities={'browserName': 'chrome',
-                          'goog:chromeOptions': {'extensions': [], 'args': [self.curr_user_agent, '--headless']}, 'platform': 'ANY',
+                          'goog:chromeOptions': {'extensions': [], 'args': [self.curr_user_agent, '--headless', 'disable-infobars']}, 'platform': 'ANY',
                           'version': ''})
 
     def fast_get_page(self, url:str, try_times=15, min_time_to_wait=5, max_time_to_wait=15, is_max=False, is_scroll_to_bottom=True):
@@ -2193,9 +2095,7 @@ class Driver(object):
             try:
                 self.driver.switch_to.window(self.driver.window_handles[-1])
                 self.driver.set_page_load_timeout(random.randint(min_time_to_wait, max_time_to_wait))
-                click_ele = self.until_presence_of_element_located_by_css_selector(ele=ele, css_selector=click_css_selector)
-                self.focus_on_element(ele=click_ele)
-                click_ele.click()
+                self.until_scroll_to_center_click_by_css_selector(ele=ele, css_selector=click_css_selector)
                 self.driver.switch_to.window(self.driver.window_handles[-1])
                 self.driver.refresh()
                 if is_scroll_to_bottom:
@@ -2224,9 +2124,7 @@ class Driver(object):
         try:
             self.driver.switch_to.window(self.driver.window_handles[-1])
             self.driver.set_page_load_timeout(random.randint(min_time_to_wait, max_time_to_wait))
-            click_ele = self.until_presence_of_element_located_by_css_selector(ele=ele, css_selector=click_css_selector)
-            self.focus_on_element(ele=click_ele)
-            click_ele.click()
+            self.until_scroll_to_center_click_by_css_selector(ele=ele, css_selector=click_css_selector)
             self.driver.switch_to.window(self.driver.window_handles[-1])
             self.driver.refresh()
             if is_scroll_to_bottom:
@@ -2242,7 +2140,7 @@ class Driver(object):
             self.driver.close()
             self.driver.switch_to.window(self.driver.window_handles[-1])
 
-    def fast_click_first_item_page_by_partial_link_text(self, link_text:str, try_times=15, min_time_to_wait=5, max_time_to_wait=15, is_scroll_to_bottom=True):
+    def fast_click_first_item_page_by_partial_link_text(self, link_text:str, ele=None, try_times=15, min_time_to_wait=5, max_time_to_wait=15, is_scroll_to_bottom=True):
         """
         点击列表第一个元素快速加载页面
         :param link_text:
@@ -2255,7 +2153,7 @@ class Driver(object):
             try:
                 self.driver.switch_to.window(self.driver.window_handles[-1])
                 self.driver.set_page_load_timeout(random.randint(min_time_to_wait, max_time_to_wait))
-                self.until_presence_of_all_elements_located_by_partial_link_text(link_text=link_text)[0].click()
+                self.until_scroll_to_center_click_by_first_partial_link_text(ele=ele, link_text=link_text)
                 self.driver.switch_to.window(self.driver.window_handles[-1])
                 self.driver.refresh()
                 if is_scroll_to_bottom:
@@ -2278,7 +2176,7 @@ class Driver(object):
         :return:
         """
         try:
-            self.until_send_enter_by_css_selector(css_selector=css_selector)
+            self.until_scroll_to_center_send_enter_by_css_selector(css_selector=css_selector)
         except Exception:
             self.fast_new_page(url=self.driver.current_url, try_times=try_times)
             self.driver.switch_to.window(self.driver.window_handles[-2])
@@ -2294,8 +2192,10 @@ class Driver(object):
         """
         curr_url = ''
         try:
-            curr_url = self.until_presence_of_all_elements_located_by_partial_link_text(link_text=link_text)[0].get_attribute('href')
-            self.until_presence_of_all_elements_located_by_partial_link_text(link_text=link_text)[0].click()
+            ele = self.until_presence_of_all_elements_located_by_partial_link_text(link_text=link_text)[0]
+            self.scroll_to_center(ele=ele)
+            curr_url = ele.get_attribute('href')
+            self.until_scroll_to_center_click_by_first_partial_link_text(link_text=link_text)
         except Exception:
             try:
                 curr_url = self.driver.current_url

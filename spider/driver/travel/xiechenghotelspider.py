@@ -186,7 +186,21 @@ def get_around_facilities(self, _str):
             around.setdefault(item[0], (lambda x: x[1:] if len(x) >= 2 else [''])(item))
     return json.dumps(around, ensure_ascii=False)
 
+fl_shop2 = Fieldlist(
+    Field(fieldname=FieldName.SHOP_ROOM_RECOMMEND_ALL,css_selector='#hotelRoomBox', attr='innerHTML', filter_func=get_recommend_all_room_dict,offset=6,try_times=20,pause_time=5),
+    Field(fieldname=FieldName.SHOP_ROOM_FAVOURABLE,css_selector='#divDetailMain > div.htl_room_table',attr='innerHTML', filter_func=get_favourable_room),
+    Field(fieldname=FieldName.SHOP_INTRO, css_selector='#hotel_info_comment > div',attr='innerHTML', filter_func=get_hotel_intro),
+    Field(fieldname=FieldName.SHOP_PHONE, css_selector='#J_realContact', attr='data-real', regex='^([^<]*).*$', repl=r'\1'),
+    Field(fieldname=FieldName.SHOP_STATISTICS, css_selector='#commentList > div.detail_cmt_box',attr='innerHTML',filter_func=get_shop_statistics),
+    Field(fieldname=FieldName.SHOP_AROUND_FACILITIES, css_selector='#hotel_info_comment > div', attr='innerHTML',filter_func=get_around_facilities),
+)
+
+page_shop_1 = Page(name='携程酒店店铺列表页面', fieldlist=fl_shop1, listcssselector=ListCssSelector(list_css_selector='#hotel_list > div.hotel_new_list', item_css_selector='ul.hotel_item'), mongodb=Mongodb(db=TravelDriver.db, collection=TravelDriver.shop_collection))
+
+page_shop_2 = Page(name='携程酒店店铺详情页面', fieldlist=fl_shop2, tabsetup=TabSetup(click_css_selector='li.hotel_price_icon > div.action_info > p > a'), mongodb=Mongodb(db=TravelDriver.db,collection=TravelDriver.shop_collection), is_save=True)
+
 fl_comment1 = Fieldlist(
+    Field(fieldname=FieldName.SHOP_NAME, css_selector='#J_htl_info > div.name > h2.cn_n'),
     Field(fieldname=FieldName.COMMENT_USER_NAME, css_selector='div.user_info.J_ctrip_pop > p.name'),
     Field(fieldname=FieldName.COMMENT_USER_IMG, css_selector='div.user_info.J_ctrip_pop > p.head > span > img', attr='src'),
     Field(fieldname=FieldName.COMMENT_USER_CHECK_IN, css_selector='div.comment_main > p > span.date'),
@@ -202,51 +216,36 @@ fl_comment1 = Fieldlist(
 
 page_comment_1 = Page(name='携程酒店评论列表', fieldlist=fl_comment1, listcssselector=ListCssSelector(list_css_selector='#divCtripComment > div.comment_detail_list > div.comment_block'), mongodb=Mongodb(db=TravelDriver.db, collection=TravelDriver.comments_collection), is_save=True)
 
-def get_shop_comment(self:TravelDriver, _str):
-    try:
-        self.focus_on_element_by_css_selector(css_selector='#divCtripComment > div.comment_box_bar_new.clearfix > div.bar_right > select.select_sort')
-        time.sleep(8)
-        self.until_select_by_visible_text_by_css_selector(css_selector='#divCtripComment > div.comment_box_bar_new.clearfix > div.bar_right > select.select_sort',text='入住时间排序')
-    except Exception:
-        self.error_log(e='点击入住时间排序出错!!!')
-    time.sleep(8)#为了缓冲页面排序的变化
-    page_comment_1.fieldlist.append(Field(fieldname=FieldName.SHOP_NAME, fieldvalue=_str))
-    try:
-        self.until_click_no_next_page_by_css_selector(func=self.from_page_get_data_list, css_selector='#divCtripComment > div.c_page_box > div > a.c_down', page=page_comment_1, current_css_selector='#divCtripComment > div.c_page_box > div > div.c_page_list.layoutfix > a.current > span', is_debug=True, nocurrent_css_selector='#divCtripComment > div.c_page_box > div > a.c_down_nocurrent')
-    except Exception:
-        pass
-    return _str
-
-fl_shop2 = Fieldlist(
-    Field(fieldname=FieldName.SHOP_ROOM_RECOMMEND_ALL,css_selector='#hotelRoomBox', attr='innerHTML', filter_func=get_recommend_all_room_dict,offset=6,try_times=20,pause_time=5),
-    Field(fieldname=FieldName.SHOP_ROOM_FAVOURABLE,css_selector='#divDetailMain > div.htl_room_table',attr='innerHTML', filter_func=get_favourable_room),
-    Field(fieldname=FieldName.SHOP_INTRO, css_selector='#hotel_info_comment > div',attr='innerHTML', filter_func=get_hotel_intro),
-    Field(fieldname=FieldName.SHOP_PHONE, css_selector='#J_realContact', attr='data-real', regex='^([^<]*).*$', repl=r'\1'),
-    Field(fieldname=FieldName.SHOP_STATISTICS, css_selector='#commentList > div.detail_cmt_box',attr='innerHTML',filter_func=get_shop_statistics),
-    Field(fieldname=FieldName.SHOP_AROUND_FACILITIES, css_selector='#hotel_info_comment > div', attr='innerHTML',filter_func=get_around_facilities),
-    Field(fieldname=FieldName.SHOP_COMMENT, css_selector='#J_htl_info > div.name > h2.cn_n', filter_func=get_shop_comment),
-)
-
-page_shop_1 = Page(name='携程酒店店铺列表页面', fieldlist=fl_shop1, listcssselector=ListCssSelector(list_css_selector='#hotel_list > div.hotel_new_list', item_css_selector='ul.hotel_item'), mongodb=Mongodb(db=TravelDriver.db, collection=TravelDriver.shop_collection))
-
-page_shop_2 = Page(name='携程酒店店铺详情页面', fieldlist=fl_shop2, tabsetup=TabSetup(click_css_selector='li.hotel_price_icon > div.action_info > p > a'), mongodb=Mongodb(db=TravelDriver.db,collection=TravelDriver.shop_collection), is_save=True)
-
 class XiechengHotelSpider(TravelDriver):
+
+    def get_shop_comment(self):
+        try:
+            self.until_scroll_to_center_select_by_visible_text_by_css_selector(
+                css_selector='#divCtripComment > div.comment_box_bar_new.clearfix > div.bar_right > select.select_sort',
+                text='入住时间排序')
+        except Exception:
+            self.error_log(e='点击入住时间排序出错!!!')
+        time.sleep(5)  # 为了缓冲页面排序的变化
+        try:
+            self.until_click_no_next_page_by_css_selector(func=self.from_page_get_data_list,
+                                                          css_selector='#divCtripComment > div.c_page_box > div > a.c_down',
+                                                          page=page_comment_1)
+        except Exception:
+            pass
 
     def get_shop_info(self):
         try:
             shop_data_list = self.from_page_get_data_list(page=page_shop_1)
-            self.from_page_add_data_to_data_list(page=page_shop_2, data_list=shop_data_list, pre_page=page_shop_1)
+            self.from_page_add_data_to_data_list(page=page_shop_2, data_list=shop_data_list, pre_page=page_shop_1, extra_page_func=None)
         except Exception as e:
             self.error_log(e=e)
 
     def get_shop_info_list(self):
-        self.fast_get_page('http://hotels.ctrip.com/', is_scroll_to_bottom=False,is_max=True)
-        self.until_send_text_by_css_selector(css_selector="#txtCity", text=self.data_region)
-        time.sleep(5)
-        self.until_send_enter_by_css_selector(css_selector="#txtCity")
+        self.fast_get_page('http://hotels.ctrip.com/', is_scroll_to_bottom=False)
+        self.until_scroll_to_center_send_text_by_css_selector(css_selector="#txtCity", text=self.data_region)
         time.sleep(3)
-        self.vertical_scroll_by(offset=300)
+        self.until_scroll_to_center_send_enter_by_css_selector(css_selector="#txtCity")
+        time.sleep(3)
         self.fast_click_same_page_by_css_selector(click_css_selector='#btnSearch')
         self.until_click_no_next_page_by_css_selector(func=self.get_shop_info, css_selector='#downHerf.c_down')
 
