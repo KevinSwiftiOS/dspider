@@ -175,7 +175,7 @@ class Driver(object):
         try:
             self.driver.execute_script(js_script, self.until_presence_of_element_located_by_css_selector(ele=ele, css_selector=css_selector, timeout=timeout))
         except Exception:
-            self.error_log(e='滚动到页面中间出错!!!')
+            self.error_log(e='由于元素不存在,滚动元素到页面中间出错!!!',istraceback=False)
 
     def until_scroll_to_center_by_partial_link_text(self, link_text:str, ele=None, timeout=10):
         '''
@@ -190,7 +190,7 @@ class Driver(object):
         try:
             self.driver.execute_script(js_script, self.until_presence_of_element_located_by_partial_link_text(ele=ele, link_text=link_text, timeout=timeout))
         except Exception:
-            self.error_log(e='滚动到页面中间出错!!!')
+            self.error_log(e='由于元素不存在,滚动元素到页面中间出错!!!',istraceback=False)
 
     def until_scroll_to_center_by_link_text(self, link_text:str, ele=None, timeout=10):
         '''
@@ -205,7 +205,7 @@ class Driver(object):
         try:
             self.driver.execute_script(js_script, self.until_presence_of_element_located_by_link_text(ele=ele, link_text=link_text, timeout=timeout))
         except Exception:
-            self.error_log(e='滚动到页面中间出错!!!')
+            self.error_log(e='由于元素不存在,滚动元素到页面中间出错!!!',istraceback=False)
 
     def scroll_to_center(self, ele=None):
         '''
@@ -219,7 +219,7 @@ class Driver(object):
         try:
             self.driver.execute_script(js_script, ele)
         except Exception:
-            self.error_log(e='滚动到页面中间出错!!!')
+            self.error_log(e='由于元素不存在,滚动元素到页面中间出错!!!',istraceback=False)
 
     def vertical_scroll_by(self, offset=100):
         """
@@ -658,7 +658,7 @@ class Driver(object):
         """
         if not ele:
             ele = self.driver
-        self.until_scroll_to_center_by_css_selector(ele=ele, css_selector=css_selector)#元素居中
+        self.until_scroll_to_center_by_css_selector(ele=ele, css_selector=css_selector, timeout=timeout)#元素居中
         return self.until_presence_of_element_located_by_css_selector(ele=ele, css_selector=css_selector, timeout=timeout)
 
     def until_presence_of_element_located_by_link_text(self, link_text:str, ele=None, timeout=10):
@@ -683,7 +683,7 @@ class Driver(object):
         """
         if not ele:
             ele = self.driver
-        self.until_scroll_to_center_by_link_text(ele=ele, link_text=link_text)
+        self.until_scroll_to_center_by_link_text(ele=ele, link_text=link_text, timeout=timeout)
         return self.until_presence_of_element_located_by_link_text(ele=ele, link_text=link_text, timeout=timeout)
 
     def until_presence_of_element_located_by_partial_link_text(self, link_text:str, ele=None, timeout=10):
@@ -708,7 +708,7 @@ class Driver(object):
         """
         if not ele:
             ele = self.driver
-        self.until_scroll_to_center_by_partial_link_text(ele=ele, link_text=link_text)
+        self.until_scroll_to_center_by_partial_link_text(ele=ele, link_text=link_text, timeout=timeout)
         return self.until_presence_of_element_located_by_partial_link_text(ele=ele, link_text=link_text, timeout=timeout)
 
     def until_visibility_of_by_id(self, id:str, ele=None, timeout=10):
@@ -1425,7 +1425,7 @@ class Driver(object):
                 self.info_log(data='第%s次刷新!!!'%count)
                 self.driver.refresh()
 
-    def until_click_no_next_page_by_css_selector(self, css_selector:str, func=None, timeout=1, pause_time=1, is_next=True, is_debug=False, **kwargs):
+    def until_click_no_next_page_by_css_selector(self, css_selector:str, func=None, timeout=1, pause_time=2, is_next=True, is_debug=False, **kwargs):
         """
         根据css样式点击直到没有下一页
         :param css_selector:
@@ -1764,11 +1764,11 @@ class Driver(object):
         time.sleep(field.pause_time)
         try:
             if ele and field.css_selector:
-                ele = self.until_scroll_to_center_presence_of_element_located_by_css_selector(ele=ele,css_selector=field.css_selector,timeout=field.timeout)
+                ele = self.until_scroll_to_center_presence_of_element_located_by_css_selector(ele=ele,css_selector=field.css_selector, timeout=field.timeout)
             elif ele and not field.css_selector:
                 ele = ele
             elif not ele and field.css_selector:
-                ele = self.until_scroll_to_center_presence_of_element_located_by_css_selector(css_selector=field.css_selector,timeout=field.timeout)
+                ele = self.until_scroll_to_center_presence_of_element_located_by_css_selector(css_selector=field.css_selector, timeout=field.timeout)
             else:
                 self.error_log(name=field.fieldname, e='未指定样式选择器和目标元素,无法取得该字段内容!!!')
                 raise ValueError
@@ -1824,7 +1824,7 @@ class Driver(object):
         self.info_log(name=field.fieldname, data=str(_float))
         return _float
 
-    def run_new_tab_task(self, url:str, name='', try_times=15, pause_time=1, func=None, **kwargs):
+    def run_new_tab_task(self, url:str, name='', try_times=15, pause_time=1, page_func1=None, page_func2=None, func=None, **kwargs):
         """
         运行一个新建标签页的任务(默认根据url打开标签页)
         :param try_times:
@@ -1843,12 +1843,18 @@ class Driver(object):
         if not self.fast_new_page(url,try_times=try_times):
             return None
         time.sleep(pause_time)
+        if not page_func1:
+            page_func1 = empty_func
+        page_func1()
         data = func(**kwargs)
+        if not page_func2:
+            page_func2 = empty_func
+        page_func2()
         self.driver.close()
         self.driver.switch_to.window(self.driver.window_handles[-1])
         return data
 
-    def run_click_tab_task(self, click_css_selector:str, ele=None, try_times=15, pause_time=1, name='', func=None, page_func=None, **kwargs):
+    def run_click_tab_task(self, click_css_selector:str, ele=None, name='', try_times=15, pause_time=1, page_func1=None, page_func2=None, func=None, **kwargs):
         """
         运行一个点击出来的标签页的任务(通过按钮点击打开标签页)
         :param ele:
@@ -1870,10 +1876,13 @@ class Driver(object):
         if not self.fast_click_page_by_css_selector(click_css_selector=click_css_selector, ele=ele, try_times=try_times):
             return None
         time.sleep(pause_time)
-        if not page_func:
-            page_func = empty_func
-        page_func()
+        if not page_func1:
+            page_func1 = empty_func
+        page_func1()
         data = func(**kwargs)
+        if not page_func2:
+            page_func2 = empty_func
+        page_func2()
         self.driver.close()
         self.driver.switch_to.window(self.driver.window_handles[-1])
         return data
@@ -1956,7 +1965,7 @@ class Driver(object):
             data.setdefault(field.fieldname, d)
         return data
 
-    def from_page_add_data_to_data_list(self, page:Page, pre_page:Page, data_list=list(), page_func=None, extra_page_func=None):
+    def from_page_add_data_to_data_list(self, page:Page, pre_page:Page, page_func1=None, page_func2=None, data_list=list()):
         """
         把当前页面的数据再次添加到之前的页面里面
         :param page:爬虫页面
@@ -1980,9 +1989,9 @@ class Driver(object):
                 else:
                     item_css_selector = '%s:nth-child(%s)' % (pre_page.listcssselector.list_css_selector, i+1)
                 ele = self.until_presence_of_element_located_by_css_selector(css_selector=item_css_selector)
-                add_data = self.run_click_tab_task(ele=ele, try_times=page.tabsetup.try_times, pause_time=page.tabsetup.pause_time, name=page.name, click_css_selector=page.tabsetup.click_css_selector, func=self.from_fieldlist_get_data, page_func=page_func, page=page)
+                add_data = self.run_click_tab_task(ele=ele, try_times=page.tabsetup.try_times, pause_time=page.tabsetup.pause_time, name=page.name, click_css_selector=page.tabsetup.click_css_selector, page_func1=page_func1, page_func2=page_func2, func=self.from_fieldlist_get_data, page=page)
             elif page.tabsetup.url_name:
-                add_data = self.run_new_tab_task(try_times=page.tabsetup.try_times, pause_time=page.tabsetup.pause_time, name=page.name, url=data_list[i].get(page.tabsetup.url_name), func=self.from_fieldlist_get_data, page=page)
+                add_data = self.run_new_tab_task(try_times=page.tabsetup.try_times, pause_time=page.tabsetup.pause_time, name=page.name, url=data_list[i].get(page.tabsetup.url_name), page_func1=page_func1, page_func2=page_func2, func=self.from_fieldlist_get_data, page=page)
             else:
                 self.error_log(e='不属于两种标签页类型!!!')
                 raise ValueError
@@ -1993,11 +2002,6 @@ class Driver(object):
                         self.save_data_to_mongodb(fieldlist=fieldlist_merge, mongodb=page.mongodb, data=data_list_tmp[i])#注意关键字段必定出现在前面一页
                     else:
                         self.warning_log(e='field的fieldname的命名可能出现了重复,请检查!!!')
-        def empty_func():
-            pass
-        if not extra_page_func:
-            extra_page_func = empty_func
-        extra_page_func()
         return data_list_tmp
 
     def run_spider(self):

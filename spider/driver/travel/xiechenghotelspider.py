@@ -187,7 +187,7 @@ def get_around_facilities(self, _str):
     return json.dumps(around, ensure_ascii=False)
 
 fl_shop2 = Fieldlist(
-    Field(fieldname=FieldName.SHOP_ROOM_RECOMMEND_ALL,css_selector='#hotelRoomBox', attr='innerHTML', filter_func=get_recommend_all_room_dict,offset=6,try_times=20,pause_time=5),
+    Field(fieldname=FieldName.SHOP_ROOM_RECOMMEND_ALL,css_selector='#hotelRoomBox', attr='innerHTML', filter_func=get_recommend_all_room_dict, pause_time=1),
     Field(fieldname=FieldName.SHOP_ROOM_FAVOURABLE,css_selector='#divDetailMain > div.htl_room_table',attr='innerHTML', filter_func=get_favourable_room),
     Field(fieldname=FieldName.SHOP_INTRO, css_selector='#hotel_info_comment > div',attr='innerHTML', filter_func=get_hotel_intro),
     Field(fieldname=FieldName.SHOP_PHONE, css_selector='#J_realContact', attr='data-real', regex='^([^<]*).*$', repl=r'\1'),
@@ -195,12 +195,12 @@ fl_shop2 = Fieldlist(
     Field(fieldname=FieldName.SHOP_AROUND_FACILITIES, css_selector='#hotel_info_comment > div', attr='innerHTML',filter_func=get_around_facilities),
 )
 
-page_shop_1 = Page(name='携程酒店店铺列表页面', fieldlist=fl_shop1, listcssselector=ListCssSelector(list_css_selector='#hotel_list > div.hotel_new_list', item_css_selector='ul.hotel_item'), mongodb=Mongodb(db=TravelDriver.db, collection=TravelDriver.shop_collection))
+page_shop_1 = Page(name='携程酒店店铺列表页面', fieldlist=fl_shop1, listcssselector=ListCssSelector(list_css_selector='#hotel_list > div.hotel_new_list', item_css_selector='ul.hotel_item', item_end=1), mongodb=Mongodb(db=TravelDriver.db, collection=TravelDriver.shop_collection))
 
 page_shop_2 = Page(name='携程酒店店铺详情页面', fieldlist=fl_shop2, tabsetup=TabSetup(click_css_selector='li.hotel_price_icon > div.action_info > p > a'), mongodb=Mongodb(db=TravelDriver.db,collection=TravelDriver.shop_collection), is_save=True)
 
 fl_comment1 = Fieldlist(
-    Field(fieldname=FieldName.SHOP_NAME, css_selector='#J_htl_info > div.name > h2.cn_n'),
+    Field(fieldname=FieldName.SHOP_NAME, css_selector='#J_htl_info > div.name > h2.cn_n', is_isolated=True),
     Field(fieldname=FieldName.COMMENT_USER_NAME, css_selector='div.user_info.J_ctrip_pop > p.name'),
     Field(fieldname=FieldName.COMMENT_USER_IMG, css_selector='div.user_info.J_ctrip_pop > p.head > span > img', attr='src'),
     Field(fieldname=FieldName.COMMENT_USER_CHECK_IN, css_selector='div.comment_main > p > span.date'),
@@ -227,16 +227,14 @@ class XiechengHotelSpider(TravelDriver):
             self.error_log(e='点击入住时间排序出错!!!')
         time.sleep(5)  # 为了缓冲页面排序的变化
         try:
-            self.until_click_no_next_page_by_css_selector(func=self.from_page_get_data_list,
-                                                          css_selector='#divCtripComment > div.c_page_box > div > a.c_down',
-                                                          page=page_comment_1)
+            self.until_click_no_next_page_by_css_selector(func=self.from_page_get_data_list, css_selector='#divCtripComment > div.c_page_box > div > a.c_down', page=page_comment_1)
         except Exception:
             pass
 
     def get_shop_info(self):
         try:
             shop_data_list = self.from_page_get_data_list(page=page_shop_1)
-            self.from_page_add_data_to_data_list(page=page_shop_2, data_list=shop_data_list, pre_page=page_shop_1, extra_page_func=None)
+            self.from_page_add_data_to_data_list(page=page_shop_2, data_list=shop_data_list, pre_page=page_shop_1, page_func2=self.get_shop_comment)
         except Exception as e:
             self.error_log(e=e)
 
@@ -245,9 +243,9 @@ class XiechengHotelSpider(TravelDriver):
         self.until_scroll_to_center_send_text_by_css_selector(css_selector="#txtCity", text=self.data_region)
         time.sleep(3)
         self.until_scroll_to_center_send_enter_by_css_selector(css_selector="#txtCity")
-        time.sleep(3)
+        time.sleep(2)
         self.fast_click_same_page_by_css_selector(click_css_selector='#btnSearch')
-        self.until_click_no_next_page_by_css_selector(func=self.get_shop_info, css_selector='#downHerf.c_down')
+        self.until_click_no_next_page_by_css_selector(func=self.get_shop_info, css_selector='#downHerf.c_down', is_next=False)
 
     def run_spider(self):
         try:

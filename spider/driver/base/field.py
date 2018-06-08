@@ -190,7 +190,7 @@ FIELD_NAME_ZH = {
 #offset是每次为了寻找元素偏移的距离
 #try_times是为了寻找元素偏移的次数
 class Field(object):
-    def __init__(self, fieldname='', css_selector='', attr='', regex='', repl='', timeout=2, offset=20, try_times=1, list_css_selector='', item_css_selector='', pause_time=0, filter_func=None, is_debug=False, is_isolated=False):
+    def __init__(self, fieldname='', css_selector='', attr='', regex='', repl='', timeout=1, offset=20, try_times=1, list_css_selector='', item_css_selector='', pause_time=0, filter_func=None, is_debug=False, is_isolated=False):
         """
 
         :param fieldname:字段的名称
