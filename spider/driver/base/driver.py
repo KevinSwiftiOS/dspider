@@ -1499,6 +1499,14 @@ class Driver(object):
         self.driver.close()
         self.driver.switch_to.window(self.driver.window_handles[-1])
 
+    def close_curr_page(self):
+        """
+        关闭当前的页面
+        :return:
+        """
+        self.driver.close()
+        self.driver.switch_to.window(self.driver.window_handles[-1])
+
     def switch_window_by_index(self,index:int):
         """
         根据索引切换浏览器窗口
@@ -1848,15 +1856,15 @@ class Driver(object):
         self.info_log(name=field.fieldname, data=str(_float))
         return _float
 
-    def run_new_tab_task(self, url:str, name='', try_times=15, pause_time=1, page_func1=None, page_func2=None, func=None, **kwargs):
+    def run_new_tab_task(self, url:str, name='', try_times=15, pause_time=1, page_func=None, is_close_curr_window=True, func=None, **kwargs):
         """
         运行一个新建标签页的任务(默认根据url打开标签页)
         :param url:标签页链接
         :param name:页面名称
         :param try_times:
         :param pause_time:暂停的时间
-        :param page_func1:
-        :param page_func2:
+        :param page_func:
+        :param is_close_curr_window:是否关闭当前窗口
         :param func:执行函数
         :param kwargs:执行函数参数
         :return:
@@ -1869,18 +1877,15 @@ class Driver(object):
         if not self.fast_new_page(url,try_times=try_times):
             return None
         time.sleep(pause_time)
-        if not page_func1:
-            page_func1 = empty_func
-        page_func1()
+        if not page_func:
+            page_func = empty_func
+        page_func()
         data = func(**kwargs)
-        if not page_func2:
-            page_func2 = empty_func
-        page_func2()
-        self.driver.close()
-        self.driver.switch_to.window(self.driver.window_handles[-1])
+        if is_close_curr_window:#是否关闭当前页面
+            self.close_curr_page()
         return data
 
-    def run_click_tab_task(self, click_css_selector:str, ele=None, name='', try_times=15, pause_time=1, page_func1=None, page_func2=None, func=None, **kwargs):
+    def run_click_tab_task(self, click_css_selector:str, ele=None, name='', try_times=15, pause_time=1, page_func=None, is_close_curr_window=True, func=None, **kwargs):
         """
         运行一个点击出来的标签页的任务(通过按钮点击打开标签页)
         :param click_css_selector:点击的元素css选择器
@@ -1888,8 +1893,8 @@ class Driver(object):
         :param name:页面名称
         :param try_times:
         :param pause_time:
-        :param page_func1:
-        :param page_func2:
+        :param page_func:
+        :param is_close_curr_window:是否关闭当前窗口
         :param func:执行函数
         :param kwargs:执行函数参数
         :return:
@@ -1904,15 +1909,12 @@ class Driver(object):
         if not self.fast_click_page_by_css_selector(click_css_selector=click_css_selector, ele=ele, try_times=try_times):
             return None
         time.sleep(pause_time)
-        if not page_func1:
-            page_func1 = empty_func
-        page_func1()
+        if not page_func:
+            page_func = empty_func
+        page_func()
         data = func(**kwargs)
-        if not page_func2:
-            page_func2 = empty_func
-        page_func2()
-        self.driver.close()
-        self.driver.switch_to.window(self.driver.window_handles[-1])
+        if is_close_curr_window:#是否关闭当前页面
+            self.close_curr_page()
         return data
 
     def select_Field_by_css_selector(self, field:Field, ele=None):
@@ -1993,14 +1995,14 @@ class Driver(object):
             data.setdefault(field.fieldname, d)
         return data
 
-    def from_page_add_data_to_data_list(self, page:Page, pre_page:Page, data_list=list(), page_func1=None, page_func2=None):
+    def from_page_add_data_to_data_list(self, page:Page, pre_page:Page, data_list=list(), page_func=None, extra_page_func=None):
         """
         把当前页面的数据再次添加到之前的页面里面
         :param pre_page:先前的页面
         :param page:爬虫页面
         :param data_list:字典类型数据列表
-        :param page_func1:页面上面执行操作
-        :param page_func2:页面上面执行操作
+        :param page_func:页面上面执行的准备操作
+        :param is_close_curr_window:是否关闭当前窗口
         :return:
         """
         #整合fieldlist
@@ -2018,9 +2020,9 @@ class Driver(object):
                 else:
                     item_css_selector = '%s:nth-child(%s)' % (pre_page.listcssselector.list_css_selector, i+1)
                 ele = self.until_presence_of_element_located_by_css_selector(css_selector=item_css_selector)
-                add_data = self.run_click_tab_task(ele=ele, try_times=page.tabsetup.try_times, pause_time=page.tabsetup.pause_time, name=page.name, click_css_selector=page.tabsetup.click_css_selector, page_func1=page_func1, page_func2=page_func2, func=self.from_fieldlist_get_data, page=page)
+                add_data = self.run_click_tab_task(ele=ele, try_times=page.tabsetup.try_times, pause_time=page.tabsetup.pause_time, name=page.name, click_css_selector=page.tabsetup.click_css_selector, page_func=page_func, is_close_curr_window=not extra_page_func, func=self.from_fieldlist_get_data, page=page)
             elif page.tabsetup.url_name:
-                add_data = self.run_new_tab_task(try_times=page.tabsetup.try_times, pause_time=page.tabsetup.pause_time, name=page.name, url=data_list[i].get(page.tabsetup.url_name), page_func1=page_func1, page_func2=page_func2, func=self.from_fieldlist_get_data, page=page)
+                add_data = self.run_new_tab_task(try_times=page.tabsetup.try_times, pause_time=page.tabsetup.pause_time, name=page.name, url=data_list[i].get(page.tabsetup.url_name), page_func=page_func, is_close_curr_window=not extra_page_func, func=self.from_fieldlist_get_data, page=page)
             else:
                 self.error_log(e='不属于两种标签页类型!!!')
                 raise ValueError
@@ -2031,6 +2033,9 @@ class Driver(object):
                         self.save_data_to_mongodb(fieldlist=fieldlist_merge, mongodb=page.mongodb, data=data_list_tmp[i])#注意关键字段必定出现在前面一页
                     else:
                         self.warning_log(e='field的fieldname的命名可能出现了重复,请检查!!!')
+            if extra_page_func:
+                extra_page_func()
+                self.close_curr_page()
         return data_list_tmp
 
     def run_spider(self):

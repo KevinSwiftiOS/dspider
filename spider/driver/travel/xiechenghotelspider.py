@@ -234,7 +234,7 @@ class XiechengHotelSpider(TravelDriver):
     def get_shop_info(self):
         try:
             shop_data_list = self.from_page_get_data_list(page=page_shop_1)
-            self.from_page_add_data_to_data_list(page=page_shop_2, pre_page=page_shop_1, data_list=shop_data_list, page_func2=self.get_shop_comment)
+            self.from_page_add_data_to_data_list(page=page_shop_2, pre_page=page_shop_1, data_list=shop_data_list, extra_page_func=self.get_shop_comment)
         except Exception as e:
             self.error_log(e=e)
 
