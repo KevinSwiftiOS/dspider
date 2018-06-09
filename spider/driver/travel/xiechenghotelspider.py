@@ -200,9 +200,10 @@ page_shop_1 = Page(name='携程酒店店铺列表页面', fieldlist=fl_shop1, li
 page_shop_2 = Page(name='携程酒店店铺详情页面', fieldlist=fl_shop2, tabsetup=TabSetup(click_css_selector='li.hotel_price_icon > div.action_info > p > a'), mongodb=Mongodb(db=TravelDriver.db,collection=TravelDriver.shop_collection), is_save=True)
 
 fl_comment1 = Fieldlist(
-    Field(fieldname=FieldName.COMMENT_CONTENT, css_selector='div.comment_main > div.comment_txt > div.J_commentDetail'),
+    Field(fieldname=FieldName.COMMENT_USER_NAME, css_selector='div.user_info.J_ctrip_pop > p.name'),
+    Field(fieldname=FieldName.COMMENT_TIME, css_selector='div.comment_main > div.comment_txt > div.comment_bar > p > span', regex=r'[^\d-]*', is_focus=False),
     Field(fieldname=FieldName.SHOP_NAME, css_selector='#J_htl_info > div.name > h2.cn_n', is_isolated=True, is_focus=False),
-    Field(fieldname=FieldName.COMMENT_USER_NAME, css_selector='div.user_info.J_ctrip_pop > p.name', is_focus=False),
+    Field(fieldname=FieldName.COMMENT_CONTENT, css_selector='div.comment_main > div.comment_txt > div.J_commentDetail', is_focus=False),
     Field(fieldname=FieldName.COMMENT_USER_IMG, css_selector='div.user_info.J_ctrip_pop > p.head > span > img', attr='src', is_focus=False),
     Field(fieldname=FieldName.COMMENT_USER_CHECK_IN, css_selector='div.comment_main > p > span.date', is_focus=False),
     Field(fieldname=FieldName.COMMENT_USER_ROOM, css_selector='div.comment_main > p > a', is_focus=False),
@@ -212,7 +213,6 @@ fl_comment1 = Fieldlist(
     Field(fieldname=FieldName.COMMENT_USER_NUM, css_selector='div.user_info.J_ctrip_pop > p.num', is_focus=False),
     Field(fieldname=FieldName.COMMENT_PIC_LIST, list_css_selector='div.comment_txt > div.comment_pic', item_css_selector='div.pic > img', attr='src', timeout=0, is_focus=False),
     Field(fieldname=FieldName.COMMENT_REPLAY, css_selector='div.comment_main > div.htl_reply > p.text.text_other', is_focus=False),
-    Field(fieldname=FieldName.COMMENT_TIME, css_selector='div.comment_main > div.comment_txt > div.comment_bar > p > span', is_focus=False),
 )
 
 page_comment_1 = Page(name='携程酒店评论列表', fieldlist=fl_comment1, listcssselector=ListCssSelector(list_css_selector='#divCtripComment > div.comment_detail_list > div.comment_block'), mongodb=Mongodb(db=TravelDriver.db, collection=TravelDriver.comments_collection), is_save=True)
@@ -227,10 +227,24 @@ class XiechengHotelSpider(TravelDriver):
         except Exception:
             self.error_log(e='点击入住时间排序出错!!!')
         time.sleep(5)  # 为了缓冲页面排序的变化
-        try:
-            self.until_click_no_next_page_by_css_selector(css_selector='#divCtripComment > div.c_page_box > div > a.c_down', curr_css_selector='', func=self.from_page_get_data_list, page=page_comment_1, pause_time=3)
-        except Exception:
-            pass
+        field_shop_name = None
+        for field in page_comment_1.fieldlist:
+            if field.fieldname == FieldName.SHOP_NAME:
+                field_shop_name = field
+                break
+        if field_shop_name:
+            shop_name = self.until_presence_of_element_located_by_css_selector(css_selector=field_shop_name.css_selector, timeout=field_shop_name.timeout).text
+            time_list = [i.get(FieldName.COMMENT_TIME) for i in page_comment_1.mongodb.get_collection().find(self.merge_dict(self.data_key, {FieldName.SHOP_NAME:shop_name}), {FieldName.COMMENT_TIME:1,FieldName.ID_:0})]
+            time_list.sort(reverse=True)
+            newest_time = (lambda tl:tl[0] if len(tl) >=1 else '')(time_list)#最新的时间
+            self.debug_log(data='数据库评论最新时间:%s'%newest_time)
+            try:
+                self.until_click_no_next_page_by_css_selector(css_selector='#divCtripComment > div.c_page_box > div > a.c_down', pause_time=3, func=self.from_page_get_comment_data_list, page=page_comment_1, newest_time=newest_time)
+            except Exception:
+                pass
+        else:
+            self.error_log(e='%s字段不存在!!!'%FieldName.SHOP_NAME)
+            raise ValueError
 
     def get_shop_info(self):
         try:

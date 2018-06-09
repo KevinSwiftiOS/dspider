@@ -1424,11 +1424,10 @@ class Driver(object):
                 self.info_log(data='第%s次刷新!!!'%count)
                 self.driver.refresh()
 
-    def until_click_no_next_page_by_css_selector(self, css_selector:str, curr_css_selector='', timeout=1, pause_time=2, is_next=True, func=None, **kwargs):
+    def until_click_no_next_page_by_css_selector(self, css_selector:str, timeout=1, pause_time=2, is_next=True, func=None, **kwargs):
         """
         根据css样式点击直到没有下一页
         :param css_selector:
-        :param curr_css_selector:
         :param timeout:
         :param pause_time:
         :param is_next:专门用来测试的时候使用,表示是否点击下一页
@@ -1446,7 +1445,10 @@ class Driver(object):
         while(True):
             count += 1
             self.info_log(data='当前翻到第%s页...' % count)
-            func(**kwargs)
+            try:
+                func(**kwargs)
+            except Exception:
+                break
             if not is_next:  # 在调试的时候不需要下一页
                 break
             try:
@@ -1478,7 +1480,10 @@ class Driver(object):
         while(True):
             count += 1
             self.info_log(data='当前翻到第%s页...' % count)
-            func(**kwargs)
+            try:
+                func(**kwargs)
+            except Exception:
+                break
             if not is_next:  # 在调试的时候不需要下一页
                 break
             try:

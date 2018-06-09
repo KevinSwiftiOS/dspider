@@ -88,3 +88,17 @@ class TravelDriver(Driver):
             FieldName.DATA_REGION: self.data_region,
             FieldName.DATA_SOURCE: self.data_source,
         }
+
+    def from_page_get_comment_data_list(self, page:Page, newest_time:str):
+        if not newest_time:#如果当前没有评论
+            self.debug_log(data='数据库目前没有评论数据,直接保存到数据库!!!')
+            self.from_page_get_data_list(page=page)
+        else:
+            comment_data_list = self.from_page_get_data_list(page=page)
+            time_list = [i.get(FieldName.COMMENT_TIME) for i in comment_data_list]
+            time_list.sort(reverse=True)
+            curr_time = (lambda tl:tl[0] if len(tl) >=1 else '')(time_list)#当前最新时间
+            self.debug_log(data='当前最新评论时间%s'%curr_time)
+            if curr_time < newest_time:
+                self.info_log(data='当前的评论数据不是最近更新的,不用继续往下爬虫!!!')
+                raise ValueError
