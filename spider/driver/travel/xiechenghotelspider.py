@@ -13,18 +13,18 @@ from pyquery import PyQuery
 
 fl_shop1 = Fieldlist(
     Field(fieldname=FieldName.SHOP_NAME,css_selector='li.hotel_item_name > h2 > a',regex=r'^[\d]*(.*)$',repl=r'\1'),
-    Field(fieldname=FieldName.SHOP_URL,css_selector='li.hotel_item_name > h2 > a',attr='href',regex=r'^([^\?]*)?.*$',repl=r'\1'),
-    Field(fieldname=FieldName.SHOP_ID, css_selector='li.hotel_item_name > h2 > a', attr='href',regex=r'^[^\?\d]*([\d]*).html?.*$', repl=r'\1'),
-    Field(fieldname=FieldName.SHOP_IMG, css_selector='li.pic_medal > div > a > img', attr='src'),
-    Field(fieldname=FieldName.SHOP_ADDRESS, css_selector='li.hotel_item_name > p.hotel_item_htladdress'),
-    Field(fieldname=FieldName.SHOP_GRADE,css_selector='li.hotel_item_judge.no_comment > div.hotelitem_judge_box > a > span.hotel_value'),
-    Field(fieldname=FieldName.SHOP_STATISFACTION_PERCENT,css_selector='li.hotel_item_judge.no_comment > div.hotelitem_judge_box > a > span.total_judgement_score > span'),
-    Field(fieldname=FieldName.SHOP_RATE, css_selector='li.hotel_item_name > span', attr='innerHTML',regex=r'[^\d]*'),
-    Field(fieldname=FieldName.SHOP_ACTIVE_STATUS, css_selector='li.hotel_item_name > p.hotel_item_last_book'),
-    Field(fieldname=FieldName.SHOP_PRICE,css_selector='span.J_price_lowList'),
-    Field(fieldname=FieldName.SHOP_CATEGORY_NAME, css_selector='li.hotel_item_name > p.medal_list > span'),
-    Field(fieldname=FieldName.SHOP_COMMENT_NUM,css_selector='li.hotel_item_judge.no_comment > div.hotelitem_judge_box > a > span.hotel_judgement > span'),
-    Field(fieldname=FieldName.SHOP_GRADE_TEXT,css_selector='li.hotel_item_judge.no_comment > div.hotelitem_judge_box > a > span.recommend'),
+    Field(fieldname=FieldName.SHOP_URL,css_selector='li.hotel_item_name > h2 > a',attr='href',regex=r'^([^\?]*)?.*$',repl=r'\1', is_focus=False),
+    Field(fieldname=FieldName.SHOP_ID, css_selector='li.hotel_item_name > h2 > a', attr='href',regex=r'^[^\?\d]*([\d]*).html?.*$', repl=r'\1', is_focus=False),
+    Field(fieldname=FieldName.SHOP_IMG, css_selector='li.pic_medal > div > a > img', attr='src', is_focus=False),
+    Field(fieldname=FieldName.SHOP_ADDRESS, css_selector='li.hotel_item_name > p.hotel_item_htladdress', is_focus=False),
+    Field(fieldname=FieldName.SHOP_GRADE,css_selector='li.hotel_item_judge.no_comment > div.hotelitem_judge_box > a > span.hotel_value', is_focus=False),
+    Field(fieldname=FieldName.SHOP_STATISFACTION_PERCENT,css_selector='li.hotel_item_judge.no_comment > div.hotelitem_judge_box > a > span.total_judgement_score > span',is_focus=False),
+    Field(fieldname=FieldName.SHOP_RATE, css_selector='li.hotel_item_name > span', attr='innerHTML',regex=r'[^\d]*', is_focus=False),
+    Field(fieldname=FieldName.SHOP_ACTIVE_STATUS, css_selector='li.hotel_item_name > p.hotel_item_last_book', is_focus=False),
+    Field(fieldname=FieldName.SHOP_PRICE,css_selector='span.J_price_lowList', is_focus=False),
+    Field(fieldname=FieldName.SHOP_CATEGORY_NAME, css_selector='li.hotel_item_name > p.medal_list > span', is_focus=False),
+    Field(fieldname=FieldName.SHOP_COMMENT_NUM,css_selector='li.hotel_item_judge.no_comment > div.hotelitem_judge_box > a > span.hotel_judgement > span', is_focus=False),
+    Field(fieldname=FieldName.SHOP_GRADE_TEXT,css_selector='li.hotel_item_judge.no_comment > div.hotelitem_judge_box > a > span.recommend', is_focus=False),
 )
 
 
@@ -200,18 +200,18 @@ page_shop_1 = Page(name='携程酒店店铺列表页面', fieldlist=fl_shop1, li
 page_shop_2 = Page(name='携程酒店店铺详情页面', fieldlist=fl_shop2, tabsetup=TabSetup(click_css_selector='li.hotel_price_icon > div.action_info > p > a'), mongodb=Mongodb(db=TravelDriver.db,collection=TravelDriver.shop_collection), is_save=True)
 
 fl_comment1 = Fieldlist(
-    Field(fieldname=FieldName.SHOP_NAME, css_selector='#J_htl_info > div.name > h2.cn_n', is_isolated=True),
-    Field(fieldname=FieldName.COMMENT_USER_NAME, css_selector='div.user_info.J_ctrip_pop > p.name'),
-    Field(fieldname=FieldName.COMMENT_USER_IMG, css_selector='div.user_info.J_ctrip_pop > p.head > span > img', attr='src'),
-    Field(fieldname=FieldName.COMMENT_USER_CHECK_IN, css_selector='div.comment_main > p > span.date'),
-    Field(fieldname=FieldName.COMMENT_USER_ROOM, css_selector='div.comment_main > p > a'),
-    Field(fieldname=FieldName.COMMENT_TYPE, css_selector='div.comment_main > p > span.type'),
-    Field(fieldname=FieldName.COMMENT_SCORE, css_selector='div.comment_main > p > span.score', regex=r'[^\d.]*'),
-    Field(fieldname=FieldName.COMMENT_SCORE_TEXT, css_selector='div.comment_main > p > span.small_c', attr='data-value'),
-    Field(fieldname=FieldName.COMMENT_USER_NUM, css_selector='div.user_info.J_ctrip_pop > p.num'),
     Field(fieldname=FieldName.COMMENT_CONTENT, css_selector='div.comment_main > div.comment_txt > div.J_commentDetail'),
-    Field(fieldname=FieldName.COMMENT_PIC_LIST, list_css_selector='div.comment_txt > div.comment_pic', item_css_selector='div.pic > img', attr='src'),
-    Field(fieldname=FieldName.COMMENT_REPLAY, css_selector='div.comment_main > div.htl_reply > p.text.text_other'),
+    Field(fieldname=FieldName.SHOP_NAME, css_selector='#J_htl_info > div.name > h2.cn_n', is_isolated=True, is_focus=False),
+    Field(fieldname=FieldName.COMMENT_USER_NAME, css_selector='div.user_info.J_ctrip_pop > p.name', is_focus=False),
+    Field(fieldname=FieldName.COMMENT_USER_IMG, css_selector='div.user_info.J_ctrip_pop > p.head > span > img', attr='src', is_focus=False),
+    Field(fieldname=FieldName.COMMENT_USER_CHECK_IN, css_selector='div.comment_main > p > span.date', is_focus=False),
+    Field(fieldname=FieldName.COMMENT_USER_ROOM, css_selector='div.comment_main > p > a', is_focus=False),
+    Field(fieldname=FieldName.COMMENT_TYPE, css_selector='div.comment_main > p > span.type', is_focus=False),
+    Field(fieldname=FieldName.COMMENT_SCORE, css_selector='div.comment_main > p > span.score', regex=r'[^\d.]*', is_focus=False),
+    Field(fieldname=FieldName.COMMENT_SCORE_TEXT, css_selector='div.comment_main > p > span.small_c', attr='data-value', is_focus=False),
+    Field(fieldname=FieldName.COMMENT_USER_NUM, css_selector='div.user_info.J_ctrip_pop > p.num', is_focus=False),
+    Field(fieldname=FieldName.COMMENT_PIC_LIST, list_css_selector='div.comment_txt > div.comment_pic', item_css_selector='div.pic > img', attr='src', timeout=0, is_focus=False),
+    Field(fieldname=FieldName.COMMENT_REPLAY, css_selector='div.comment_main > div.htl_reply > p.text.text_other', is_focus=False),
 )
 
 page_comment_1 = Page(name='携程酒店评论列表', fieldlist=fl_comment1, listcssselector=ListCssSelector(list_css_selector='#divCtripComment > div.comment_detail_list > div.comment_block'), mongodb=Mongodb(db=TravelDriver.db, collection=TravelDriver.comments_collection), is_save=True)
@@ -227,14 +227,14 @@ class XiechengHotelSpider(TravelDriver):
             self.error_log(e='点击入住时间排序出错!!!')
         time.sleep(5)  # 为了缓冲页面排序的变化
         try:
-            self.until_click_no_next_page_by_css_selector(func=self.from_page_get_data_list, css_selector='#divCtripComment > div.c_page_box > div > a.c_down', page=page_comment_1)
+            self.until_click_no_next_page_by_css_selector(css_selector='#divCtripComment > div.c_page_box > div > a.c_down', curr_css_selector='', func=self.from_page_get_data_list, page=page_comment_1, pause_time=3)
         except Exception:
             pass
 
     def get_shop_info(self):
         try:
             shop_data_list = self.from_page_get_data_list(page=page_shop_1)
-            self.from_page_add_data_to_data_list(page=page_shop_2, data_list=shop_data_list, pre_page=page_shop_1, page_func2=self.get_shop_comment)
+            self.from_page_add_data_to_data_list(page=page_shop_2, pre_page=page_shop_1, data_list=shop_data_list, page_func2=self.get_shop_comment)
         except Exception as e:
             self.error_log(e=e)
 
@@ -245,7 +245,7 @@ class XiechengHotelSpider(TravelDriver):
         self.until_scroll_to_center_send_enter_by_css_selector(css_selector="#txtCity")
         time.sleep(2)
         self.fast_click_same_page_by_css_selector(click_css_selector='#btnSearch')
-        self.until_click_no_next_page_by_css_selector(func=self.get_shop_info, css_selector='#downHerf.c_down', is_next=False)
+        self.until_click_no_next_page_by_css_selector(css_selector='#downHerf.c_down', func=self.get_shop_info, is_next=False)
 
     def run_spider(self):
         try:

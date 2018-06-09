@@ -22,6 +22,7 @@ from selenium.common.exceptions import TimeoutException
 import sys
 from selenium.webdriver.support.ui import Select
 from pymongo.collection import Collection
+from pyquery import PyQuery
 
 class Driver(object):
     desktop_user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.79 Safari/537.36 Edge/14.14393'
@@ -207,15 +208,13 @@ class Driver(object):
         except Exception:
             self.error_log(e='由于元素不存在,滚动元素到页面中间出错!!!',istraceback=False)
 
-    def scroll_to_center(self, ele=None):
+    def scroll_to_center(self, ele:WebElement):
         '''
         把页面元素滚动到页面中间
         :param ele:
         :return:
         '''
         js_script = "window.scrollBy($(arguments[0])[0].getClientRects()[0].x + $(arguments[0])[0].clientWidth/2 - window.innerWidth/2, $(arguments[0])[0].getClientRects()[0].y + $(arguments[0])[0].clientHeight/2 - window.innerHeight/2)"
-        if not ele:
-            ele = self.driver
         try:
             self.driver.execute_script(js_script, ele)
         except Exception:
@@ -1425,15 +1424,16 @@ class Driver(object):
                 self.info_log(data='第%s次刷新!!!'%count)
                 self.driver.refresh()
 
-    def until_click_no_next_page_by_css_selector(self, css_selector:str, func=None, timeout=1, pause_time=2, is_next=True, is_debug=False, **kwargs):
+    def until_click_no_next_page_by_css_selector(self, css_selector:str, curr_css_selector='', timeout=1, pause_time=2, is_next=True, func=None, **kwargs):
         """
         根据css样式点击直到没有下一页
         :param css_selector:
-        :param func:
+        :param curr_css_selector:
         :param timeout:
         :param pause_time:
         :param is_next:专门用来测试的时候使用,表示是否点击下一页
         :param is_debug:出错时候，是否停止
+        :param func:
         :param kwargs:
         :return:
         """
@@ -1449,14 +1449,12 @@ class Driver(object):
             func(**kwargs)
             if not is_next:  # 在调试的时候不需要下一页
                 break
-            time.sleep(pause_time)
             try:
-                self.until_scroll_to_center_click_by_css_selector(css_selector=css_selector,timeout=timeout)
+                self.until_scroll_to_center_by_css_selector(css_selector=css_selector, timeout=timeout)
+                time.sleep(1)
+                self.until_presence_of_element_located_by_css_selector(css_selector=css_selector, timeout=timeout).click()
+                time.sleep(pause_time)#每一次点击完毕,刷新页面需要缓冲时间
             except Exception as e:
-                if is_debug:
-                    self.debug_log(data='程序点击下一页出错,已经暂停程序,请检查出错的原因!!!')
-                    while(True):
-                        pass
                 self.error_log(e=str(e)+'\n没有下一页了!!!',istraceback=False)
                 break
 
@@ -1483,9 +1481,11 @@ class Driver(object):
             func(**kwargs)
             if not is_next:  # 在调试的时候不需要下一页
                 break
-            time.sleep(pause_time)
             try:
-                self.until_scroll_to_center_click_by_partial_link_text(link_text=link_text,timeout=timeout)
+                self.until_scroll_to_center_by_partial_link_text(link_text=link_text, timeout=timeout)
+                time.sleep(1)
+                self.until_presence_of_element_located_by_link_text(link_text=link_text,timeout=timeout).click()
+                time.sleep(pause_time)  # 每一次点击完毕,刷新页面需要缓冲时间
             except Exception as e:
                 self.error_log(e=str(e) + '\n没有下一页了!!!', istraceback=False)
                 break
@@ -1671,11 +1671,17 @@ class Driver(object):
         time.sleep(field.pause_time)
         try:
             if ele and field.css_selector:
-                ele = self.until_scroll_to_center_presence_of_element_located_by_css_selector(ele=ele,css_selector=field.css_selector,timeout=field.timeout)
+                if field.is_focus:
+                    self.until_scroll_to_center_by_css_selector(ele=ele, css_selector=field.css_selector, timeout=field.timeout)
+                ele = self.until_presence_of_element_located_by_css_selector(ele=ele,css_selector=field.css_selector,timeout=field.timeout)
             elif ele and not field.css_selector:
+                if field.is_focus:
+                    self.scroll_to_center(ele=ele)
                 ele = ele
             elif not ele and field.css_selector:
-                ele = self.until_scroll_to_center_presence_of_element_located_by_css_selector(css_selector=field.css_selector,timeout=field.timeout)
+                if field.is_focus:
+                    self.until_scroll_to_center_by_css_selector(css_selector=field.css_selector, timeout=field.timeout)
+                ele = self.until_presence_of_element_located_by_css_selector(css_selector=field.css_selector,timeout=field.timeout)
             else:
                 self.error_log(name=field.fieldname,e='未指定样式选择器和目标元素,无法取得该字段内容!!!')
                 raise ValueError
@@ -1705,11 +1711,17 @@ class Driver(object):
         time.sleep(field.pause_time)
         try:
             if ele and field.css_selector:
-                ele = self.until_scroll_to_center_presence_of_element_located_by_css_selector(ele=ele,css_selector=field.css_selector,timeout=field.timeout)
+                if field.is_focus:
+                    self.until_scroll_to_center_by_css_selector(ele=ele, css_selector=field.css_selector, timeout=field.timeout)
+                ele = self.until_presence_of_element_located_by_css_selector(ele=ele,css_selector=field.css_selector,timeout=field.timeout)
             elif ele and not field.css_selector:
+                if field.is_focus:
+                    self.scroll_to_center(ele=ele)
                 ele = ele
             elif not ele and field.css_selector:
-                ele = self.until_scroll_to_center_presence_of_element_located_by_css_selector(css_selector=field.css_selector,timeout=field.timeout)
+                if field.is_focus:
+                    self.until_scroll_to_center_by_css_selector(css_selector=field.css_selector, timeout=field.timeout)
+                ele = self.until_presence_of_element_located_by_css_selector(css_selector=field.css_selector,timeout=field.timeout)
             else:
                 self.error_log(name=field.fieldname, e='未指定样式选择器和目标元素,无法取得该字段内容!!!')
                 raise ValueError
@@ -1764,11 +1776,17 @@ class Driver(object):
         time.sleep(field.pause_time)
         try:
             if ele and field.css_selector:
-                ele = self.until_scroll_to_center_presence_of_element_located_by_css_selector(ele=ele,css_selector=field.css_selector, timeout=field.timeout)
+                if field.is_focus:
+                    self.until_scroll_to_center_by_css_selector(ele=ele, css_selector=field.css_selector, timeout=field.timeout)
+                ele = self.until_presence_of_element_located_by_css_selector(ele=ele, css_selector=field.css_selector, timeout=field.timeout)
             elif ele and not field.css_selector:
+                if field.is_focus:
+                    self.scroll_to_center(ele=ele)
                 ele = ele
             elif not ele and field.css_selector:
-                ele = self.until_scroll_to_center_presence_of_element_located_by_css_selector(css_selector=field.css_selector, timeout=field.timeout)
+                if field.is_focus:
+                    self.until_scroll_to_center_by_css_selector(css_selector=field.css_selector, timeout=field.timeout)
+                ele = self.until_presence_of_element_located_by_css_selector(css_selector=field.css_selector, timeout=field.timeout)
             else:
                 self.error_log(name=field.fieldname, e='未指定样式选择器和目标元素,无法取得该字段内容!!!')
                 raise ValueError
@@ -1799,11 +1817,17 @@ class Driver(object):
         time.sleep(field.pause_time)
         try:
             if ele and field.css_selector:
-                ele = self.until_scroll_to_center_presence_of_element_located_by_css_selector(ele=ele,css_selector=field.css_selector, timeout=field.timeout)
+                if field.is_focus:
+                    self.until_scroll_to_center_by_css_selector(ele=ele, css_selector=field.css_selector, timeout=field.timeout)
+                ele = self.until_presence_of_element_located_by_css_selector(ele=ele, css_selector=field.css_selector, timeout=field.timeout)
             elif ele and not field.css_selector:
+                if field.is_focus:
+                    self.scroll_to_center(ele=ele)
                 ele = ele
             elif not ele and field.css_selector:
-                ele = self.until_scroll_to_center_presence_of_element_located_by_css_selector(css_selector=field.css_selector, timeout=field.timeout)
+                if field.is_focus:
+                    self.until_scroll_to_center_by_css_selector(css_selector=field.css_selector, timeout=field.timeout)
+                ele = self.until_presence_of_element_located_by_css_selector(css_selector=field.css_selector, timeout=field.timeout)
             else:
                 self.error_log(name=field.fieldname, e='未指定样式选择器和目标元素,无法取得该字段内容!!!')
                 raise ValueError
@@ -1827,10 +1851,12 @@ class Driver(object):
     def run_new_tab_task(self, url:str, name='', try_times=15, pause_time=1, page_func1=None, page_func2=None, func=None, **kwargs):
         """
         运行一个新建标签页的任务(默认根据url打开标签页)
+        :param url:标签页链接
+        :param name:页面名称
         :param try_times:
         :param pause_time:暂停的时间
-        :param name:页面名称
-        :param url:标签页链接
+        :param page_func1:
+        :param page_func2:
         :param func:执行函数
         :param kwargs:执行函数参数
         :return:
@@ -1857,11 +1883,13 @@ class Driver(object):
     def run_click_tab_task(self, click_css_selector:str, ele=None, name='', try_times=15, pause_time=1, page_func1=None, page_func2=None, func=None, **kwargs):
         """
         运行一个点击出来的标签页的任务(通过按钮点击打开标签页)
+        :param click_css_selector:点击的元素css选择器
         :param ele:
+        :param name:页面名称
         :param try_times:
         :param pause_time:
-        :param name:页面名称
-        :param click_css_selector:点击的元素css选择器
+        :param page_func1:
+        :param page_func2:
         :param func:执行函数
         :param kwargs:执行函数参数
         :return:
@@ -1965,13 +1993,14 @@ class Driver(object):
             data.setdefault(field.fieldname, d)
         return data
 
-    def from_page_add_data_to_data_list(self, page:Page, pre_page:Page, page_func1=None, page_func2=None, data_list=list()):
+    def from_page_add_data_to_data_list(self, page:Page, pre_page:Page, data_list=list(), page_func1=None, page_func2=None):
         """
         把当前页面的数据再次添加到之前的页面里面
+        :param pre_page:先前的页面
         :param page:爬虫页面
         :param data_list:字典类型数据列表
-        :param pre_page:先前的页面
-        :param page_func:页面上面执行操作
+        :param page_func1:页面上面执行操作
+        :param page_func2:页面上面执行操作
         :return:
         """
         #整合fieldlist

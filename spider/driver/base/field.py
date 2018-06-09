@@ -190,7 +190,7 @@ FIELD_NAME_ZH = {
 #offset是每次为了寻找元素偏移的距离
 #try_times是为了寻找元素偏移的次数
 class Field(object):
-    def __init__(self, fieldname='', css_selector='', attr='', regex='', repl='', timeout=1, offset=20, try_times=1, list_css_selector='', item_css_selector='', pause_time=0, filter_func=None, is_debug=False, is_isolated=False):
+    def __init__(self, fieldname='', css_selector='', attr='', regex='', repl='', timeout=2, offset=20, try_times=1, list_css_selector='', item_css_selector='', pause_time=0, filter_func=None, is_focus=True, is_debug=False, is_isolated=False):
         """
 
         :param fieldname:字段的名称
@@ -205,6 +205,7 @@ class Field(object):
         :param item_css_selector:列表字段里面字段的css选择器
         :param pause_time:暂停的时间
         :param filter_func:过滤函数
+        :param is_focus:是否将元素移到页面中间
         :param is_debug:表示是否输出调试信息
         :param is_isolated:表示爬虫字段的css_selector是否孤立
         """
@@ -221,6 +222,7 @@ class Field(object):
         self.item_css_selector = item_css_selector
         self.pause_time = pause_time
         self.filter_func = filter_func
+        self.is_focus = is_focus
         self.is_debug = is_debug
         self.is_isolated = is_isolated
 
