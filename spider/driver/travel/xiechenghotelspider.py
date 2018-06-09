@@ -195,7 +195,7 @@ fl_shop2 = Fieldlist(
     Field(fieldname=FieldName.SHOP_AROUND_FACILITIES, css_selector='#hotel_info_comment > div', attr='innerHTML',filter_func=get_around_facilities),
 )
 
-page_shop_1 = Page(name='携程酒店店铺列表页面', fieldlist=fl_shop1, listcssselector=ListCssSelector(list_css_selector='#hotel_list > div.hotel_new_list', item_css_selector='ul.hotel_item', item_end=1), mongodb=Mongodb(db=TravelDriver.db, collection=TravelDriver.shop_collection))
+page_shop_1 = Page(name='携程酒店店铺列表页面', fieldlist=fl_shop1, listcssselector=ListCssSelector(list_css_selector='#hotel_list > div.hotel_new_list', item_css_selector='ul.hotel_item'), mongodb=Mongodb(db=TravelDriver.db, collection=TravelDriver.shop_collection))
 
 page_shop_2 = Page(name='携程酒店店铺详情页面', fieldlist=fl_shop2, tabsetup=TabSetup(click_css_selector='li.hotel_price_icon > div.action_info > p > a'), mongodb=Mongodb(db=TravelDriver.db,collection=TravelDriver.shop_collection), is_save=True)
 
@@ -245,7 +245,7 @@ class XiechengHotelSpider(TravelDriver):
         self.until_scroll_to_center_send_enter_by_css_selector(css_selector="#txtCity")
         time.sleep(2)
         self.fast_click_same_page_by_css_selector(click_css_selector='#btnSearch')
-        self.until_click_no_next_page_by_css_selector(css_selector='#downHerf.c_down', func=self.get_shop_info, is_next=False)
+        self.until_click_no_next_page_by_css_selector(css_selector='#downHerf.c_down', func=self.get_shop_info)
 
     def run_spider(self):
         try:
