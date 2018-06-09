@@ -212,6 +212,7 @@ fl_comment1 = Fieldlist(
     Field(fieldname=FieldName.COMMENT_USER_NUM, css_selector='div.user_info.J_ctrip_pop > p.num', is_focus=False),
     Field(fieldname=FieldName.COMMENT_PIC_LIST, list_css_selector='div.comment_txt > div.comment_pic', item_css_selector='div.pic > img', attr='src', timeout=0, is_focus=False),
     Field(fieldname=FieldName.COMMENT_REPLAY, css_selector='div.comment_main > div.htl_reply > p.text.text_other', is_focus=False),
+    Field(fieldname=FieldName.COMMENT_TIME, css_selector='div.comment_main > div.comment_txt > div.comment_bar > p > span', is_focus=False),
 )
 
 page_comment_1 = Page(name='携程酒店评论列表', fieldlist=fl_comment1, listcssselector=ListCssSelector(list_css_selector='#divCtripComment > div.comment_detail_list > div.comment_block'), mongodb=Mongodb(db=TravelDriver.db, collection=TravelDriver.comments_collection), is_save=True)
