@@ -46,12 +46,6 @@ class DianpingHotelSpider(TravelDriver):
 
     def page_shop_2_func(self):
         pass
-        # try:
-        #     for i in self.until_presence_of_all_elements_located_by_partial_link_text(link_text='查看其他'):
-        #         i.click()
-        # except Exception:
-        #     self.error_log(e='找不到元素')
-        # time.sleep(3)
 
     def get_shop_info(self):
         try:
