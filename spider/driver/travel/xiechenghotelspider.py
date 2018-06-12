@@ -13,18 +13,18 @@ from pyquery import PyQuery
 
 fl_shop1 = Fieldlist(
     Field(fieldname=FieldName.SHOP_NAME,css_selector='li.hotel_item_name > h2 > a',regex=r'^[\d]*(.*)$',repl=r'\1'),
-    Field(fieldname=FieldName.SHOP_URL,css_selector='li.hotel_item_name > h2 > a',attr='href',regex=r'^([^\?]*)?.*$',repl=r'\1', is_focus=False),
-    Field(fieldname=FieldName.SHOP_ID, css_selector='li.hotel_item_name > h2 > a', attr='href',regex=r'^[^\?\d]*([\d]*).html?.*$', repl=r'\1', is_focus=False),
-    Field(fieldname=FieldName.SHOP_IMG, css_selector='li.pic_medal > div > a > img', attr='src', is_focus=False),
-    Field(fieldname=FieldName.SHOP_ADDRESS, css_selector='li.hotel_item_name > p.hotel_item_htladdress', is_focus=False),
-    Field(fieldname=FieldName.SHOP_GRADE,css_selector='li.hotel_item_judge.no_comment > div.hotelitem_judge_box > a > span.hotel_value', is_focus=False),
-    Field(fieldname=FieldName.SHOP_STATISFACTION_PERCENT,css_selector='li.hotel_item_judge.no_comment > div.hotelitem_judge_box > a > span.total_judgement_score > span',is_focus=False),
-    Field(fieldname=FieldName.SHOP_RATE, css_selector='li.hotel_item_name > span', attr='innerHTML',regex=r'[^\d]*', is_focus=False),
-    Field(fieldname=FieldName.SHOP_ACTIVE_STATUS, css_selector='li.hotel_item_name > p.hotel_item_last_book', is_focus=False),
-    Field(fieldname=FieldName.SHOP_PRICE,css_selector='span.J_price_lowList', is_focus=False),
-    Field(fieldname=FieldName.SHOP_CATEGORY_NAME, css_selector='li.hotel_item_name > p.medal_list > span', is_focus=False),
-    Field(fieldname=FieldName.SHOP_COMMENT_NUM,css_selector='li.hotel_item_judge.no_comment > div.hotelitem_judge_box > a > span.hotel_judgement > span', is_focus=False),
-    Field(fieldname=FieldName.SHOP_GRADE_TEXT,css_selector='li.hotel_item_judge.no_comment > div.hotelitem_judge_box > a > span.recommend', is_focus=False),
+    Field(fieldname=FieldName.SHOP_URL,css_selector='li.hotel_item_name > h2 > a',attr='href',regex=r'^([^\?]*)?.*$',repl=r'\1'),
+    Field(fieldname=FieldName.SHOP_ID, css_selector='li.hotel_item_name > h2 > a', attr='href',regex=r'^[^\?\d]*([\d]*).html?.*$', repl=r'\1'),
+    Field(fieldname=FieldName.SHOP_IMG, css_selector='li.pic_medal > div > a > img', attr='src'),
+    Field(fieldname=FieldName.SHOP_ADDRESS, css_selector='li.hotel_item_name > p.hotel_item_htladdress'),
+    Field(fieldname=FieldName.SHOP_GRADE,css_selector='li.hotel_item_judge.no_comment > div.hotelitem_judge_box > a > span.hotel_value'),
+    Field(fieldname=FieldName.SHOP_STATISFACTION_PERCENT,css_selector='li.hotel_item_judge.no_comment > div.hotelitem_judge_box > a > span.total_judgement_score > span'),
+    Field(fieldname=FieldName.SHOP_RATE, css_selector='li.hotel_item_name > span', attr='innerHTML',regex=r'[^\d]*'),
+    Field(fieldname=FieldName.SHOP_ACTIVE_STATUS, css_selector='li.hotel_item_name > p.hotel_item_last_book'),
+    Field(fieldname=FieldName.SHOP_PRICE,css_selector='span.J_price_lowList'),
+    Field(fieldname=FieldName.SHOP_CATEGORY_NAME, css_selector='li.hotel_item_name > p.medal_list > span'),
+    Field(fieldname=FieldName.SHOP_COMMENT_NUM,css_selector='li.hotel_item_judge.no_comment > div.hotelitem_judge_box > a > span.hotel_judgement > span'),
+    Field(fieldname=FieldName.SHOP_GRADE_TEXT,css_selector='li.hotel_item_judge.no_comment > div.hotelitem_judge_box > a > span.recommend'),
 )
 
 
@@ -187,12 +187,12 @@ def get_around_facilities(self, _str):
     return json.dumps(around, ensure_ascii=False)
 
 fl_shop2 = Fieldlist(
-    Field(fieldname=FieldName.SHOP_ROOM_RECOMMEND_ALL,css_selector='#hotelRoomBox', attr='innerHTML', filter_func=get_recommend_all_room_dict, pause_time=1),
-    Field(fieldname=FieldName.SHOP_ROOM_FAVOURABLE,css_selector='#divDetailMain > div.htl_room_table',attr='innerHTML', filter_func=get_favourable_room),
-    Field(fieldname=FieldName.SHOP_INTRO, css_selector='#hotel_info_comment > div',attr='innerHTML', filter_func=get_hotel_intro),
-    Field(fieldname=FieldName.SHOP_PHONE, css_selector='#J_realContact', attr='data-real', regex='^([^<]*).*$', repl=r'\1'),
-    Field(fieldname=FieldName.SHOP_STATISTICS, css_selector='#commentList > div.detail_cmt_box',attr='innerHTML',filter_func=get_shop_statistics),
-    Field(fieldname=FieldName.SHOP_AROUND_FACILITIES, css_selector='#hotel_info_comment > div', attr='innerHTML',filter_func=get_around_facilities),
+    Field(fieldname=FieldName.SHOP_ROOM_RECOMMEND_ALL,css_selector='#hotelRoomBox', attr='innerHTML', filter_func=get_recommend_all_room_dict, pause_time=1, is_focus=True),
+    Field(fieldname=FieldName.SHOP_ROOM_FAVOURABLE,css_selector='#divDetailMain > div.htl_room_table',attr='innerHTML', filter_func=get_favourable_room, is_focus=True),
+    Field(fieldname=FieldName.SHOP_INTRO, css_selector='#hotel_info_comment > div',attr='innerHTML', filter_func=get_hotel_intro, is_focus=True),
+    Field(fieldname=FieldName.SHOP_PHONE, css_selector='#J_realContact', attr='data-real', regex='^([^<]*).*$', repl=r'\1', is_focus=True),
+    Field(fieldname=FieldName.SHOP_STATISTICS, css_selector='#commentList > div.detail_cmt_box',attr='innerHTML',filter_func=get_shop_statistics, is_focus=True),
+    Field(fieldname=FieldName.SHOP_AROUND_FACILITIES, css_selector='#hotel_info_comment > div', attr='innerHTML',filter_func=get_around_facilities, is_focus=True),
 )
 
 page_shop_1 = Page(name='携程酒店店铺列表页面', fieldlist=fl_shop1, listcssselector=ListCssSelector(list_css_selector='#hotel_list > div.hotel_new_list', item_css_selector='ul.hotel_item'), mongodb=Mongodb(db=TravelDriver.db, collection=TravelDriver.shop_collection))
@@ -201,18 +201,18 @@ page_shop_2 = Page(name='携程酒店店铺详情页面', fieldlist=fl_shop2, ta
 
 fl_comment1 = Fieldlist(
     Field(fieldname=FieldName.COMMENT_USER_NAME, css_selector='div.user_info.J_ctrip_pop > p.name'),
-    Field(fieldname=FieldName.COMMENT_TIME, css_selector='div.comment_main > div.comment_txt > div.comment_bar > p > span', regex=r'[^\d-]*', is_focus=False),
-    Field(fieldname=FieldName.SHOP_NAME, css_selector='#J_htl_info > div.name > h2.cn_n', is_isolated=True, is_focus=False),
-    Field(fieldname=FieldName.COMMENT_CONTENT, css_selector='div.comment_main > div.comment_txt > div.J_commentDetail', is_focus=False),
-    Field(fieldname=FieldName.COMMENT_USER_IMG, css_selector='div.user_info.J_ctrip_pop > p.head > span > img', attr='src', is_focus=False),
-    Field(fieldname=FieldName.COMMENT_USER_CHECK_IN, css_selector='div.comment_main > p > span.date', is_focus=False),
-    Field(fieldname=FieldName.COMMENT_USER_ROOM, css_selector='div.comment_main > p > a', is_focus=False),
-    Field(fieldname=FieldName.COMMENT_TYPE, css_selector='div.comment_main > p > span.type', is_focus=False),
-    Field(fieldname=FieldName.COMMENT_SCORE, css_selector='div.comment_main > p > span.score', regex=r'[^\d.]*', is_focus=False),
-    Field(fieldname=FieldName.COMMENT_SCORE_TEXT, css_selector='div.comment_main > p > span.small_c', attr='data-value', is_focus=False),
-    Field(fieldname=FieldName.COMMENT_USER_NUM, css_selector='div.user_info.J_ctrip_pop > p.num', is_focus=False),
-    Field(fieldname=FieldName.COMMENT_PIC_LIST, list_css_selector='div.comment_txt > div.comment_pic', item_css_selector='div.pic > img', attr='src', timeout=0, is_focus=False),
-    Field(fieldname=FieldName.COMMENT_REPLAY, css_selector='div.comment_main > div.htl_reply > p.text.text_other', is_focus=False),
+    Field(fieldname=FieldName.COMMENT_TIME, css_selector='div.comment_main > div.comment_txt > div.comment_bar > p > span', regex=r'[^\d-]*'),
+    Field(fieldname=FieldName.SHOP_NAME, css_selector='#J_htl_info > div.name > h2.cn_n', is_isolated=True),
+    Field(fieldname=FieldName.COMMENT_CONTENT, css_selector='div.comment_main > div.comment_txt > div.J_commentDetail'),
+    Field(fieldname=FieldName.COMMENT_USER_IMG, css_selector='div.user_info.J_ctrip_pop > p.head > span > img', attr='src'),
+    Field(fieldname=FieldName.COMMENT_USER_CHECK_IN, css_selector='div.comment_main > p > span.date'),
+    Field(fieldname=FieldName.COMMENT_USER_ROOM, css_selector='div.comment_main > p > a'),
+    Field(fieldname=FieldName.COMMENT_TYPE, css_selector='div.comment_main > p > span.type'),
+    Field(fieldname=FieldName.COMMENT_SCORE, css_selector='div.comment_main > p > span.score', regex=r'[^\d.]*'),
+    Field(fieldname=FieldName.COMMENT_SCORE_TEXT, css_selector='div.comment_main > p > span.small_c', attr='data-value'),
+    Field(fieldname=FieldName.COMMENT_USER_NUM, css_selector='div.user_info.J_ctrip_pop > p.num'),
+    Field(fieldname=FieldName.COMMENT_PIC_LIST, list_css_selector='div.comment_txt > div.comment_pic', item_css_selector='div.pic > img', attr='src', timeout=0),
+    Field(fieldname=FieldName.COMMENT_REPLAY, css_selector='div.comment_main > div.htl_reply > p.text.text_other'),
 )
 
 page_comment_1 = Page(name='携程酒店评论列表', fieldlist=fl_comment1, listcssselector=ListCssSelector(list_css_selector='#divCtripComment > div.comment_detail_list > div.comment_block'), mongodb=Mongodb(db=TravelDriver.db, collection=TravelDriver.comments_collection), is_save=True)

@@ -28,6 +28,9 @@ class Driver(object):
     desktop_user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.79 Safari/537.36 Edge/14.14393'
     mobile_user_agent = 'Mozilla/5.0 (iPhone; CPU iPhone OS 9_2 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Version/9.0 Mobile/13C75 Safari/601.1'
     curr_user_agent = desktop_user_agent
+
+    scroll_to_center_js_script = 'window.scrollBy(arguments[0].getClientRects()[0].x + arguments[0].clientWidth / 2 - window.innerWidth / 2, arguments[0].getClientRects()[0].y + arguments[0].clientHeight / 2 - window.innerHeight / 2)'
+
     def __init__(self,log_file_name='00000000',ismobile=False,isvirtualdisplay=False,isheadless=False):
         """
 
@@ -170,11 +173,10 @@ class Driver(object):
         :param ele:
         :return:
         '''
-        js_script = "window.scrollBy($(arguments[0])[0].getClientRects()[0].x + $(arguments[0])[0].clientWidth/2 - window.innerWidth/2, $(arguments[0])[0].getClientRects()[0].y + $(arguments[0])[0].clientHeight/2 - window.innerHeight/2)"
         if not ele:
             ele = self.driver
         try:
-            self.driver.execute_script(js_script, self.until_presence_of_element_located_by_css_selector(ele=ele, css_selector=css_selector, timeout=timeout))
+            self.driver.execute_script(self.scroll_to_center_js_script, self.until_presence_of_element_located_by_css_selector(ele=ele, css_selector=css_selector, timeout=timeout))
         except Exception:
             self.error_log(e='由于元素不存在,滚动元素到页面中间出错!!!',istraceback=False)
 
@@ -185,11 +187,10 @@ class Driver(object):
         :param ele:
         :return:
         '''
-        js_script = "window.scrollBy($(arguments[0])[0].getClientRects()[0].x + $(arguments[0])[0].clientWidth/2 - window.innerWidth/2, $(arguments[0])[0].getClientRects()[0].y + $(arguments[0])[0].clientHeight/2 - window.innerHeight/2)"
         if not ele:
             ele = self.driver
         try:
-            self.driver.execute_script(js_script, self.until_presence_of_element_located_by_partial_link_text(ele=ele, link_text=link_text, timeout=timeout))
+            self.driver.execute_script(self.scroll_to_center_js_script, self.until_presence_of_element_located_by_partial_link_text(ele=ele, link_text=link_text, timeout=timeout))
         except Exception:
             self.error_log(e='由于元素不存在,滚动元素到页面中间出错!!!',istraceback=False)
 
@@ -200,11 +201,10 @@ class Driver(object):
         :param ele:
         :return:
         '''
-        js_script = "window.scrollBy($(arguments[0])[0].getClientRects()[0].x + $(arguments[0])[0].clientWidth/2 - window.innerWidth/2, $(arguments[0])[0].getClientRects()[0].y + $(arguments[0])[0].clientHeight/2 - window.innerHeight/2)"
         if not ele:
             ele = self.driver
         try:
-            self.driver.execute_script(js_script, self.until_presence_of_element_located_by_link_text(ele=ele, link_text=link_text, timeout=timeout))
+            self.driver.execute_script(self.scroll_to_center_js_script, self.until_presence_of_element_located_by_link_text(ele=ele, link_text=link_text, timeout=timeout))
         except Exception:
             self.error_log(e='由于元素不存在,滚动元素到页面中间出错!!!',istraceback=False)
 
@@ -214,9 +214,8 @@ class Driver(object):
         :param ele:
         :return:
         '''
-        js_script = "window.scrollBy($(arguments[0])[0].getClientRects()[0].x + $(arguments[0])[0].clientWidth/2 - window.innerWidth/2, $(arguments[0])[0].getClientRects()[0].y + $(arguments[0])[0].clientHeight/2 - window.innerHeight/2)"
         try:
-            self.driver.execute_script(js_script, ele)
+            self.driver.execute_script(self.scroll_to_center_js_script, ele)
         except Exception:
             self.error_log(e='由于元素不存在,滚动元素到页面中间出错!!!',istraceback=False)
 
@@ -1489,7 +1488,7 @@ class Driver(object):
             try:
                 self.until_scroll_to_center_by_partial_link_text(link_text=link_text, timeout=timeout)
                 time.sleep(1)
-                self.until_presence_of_element_located_by_link_text(link_text=link_text,timeout=timeout).click()
+                self.until_presence_of_element_located_by_partial_link_text(link_text=link_text,timeout=timeout).click()
                 time.sleep(pause_time)  # 每一次点击完毕,刷新页面需要缓冲时间
             except Exception as e:
                 self.error_log(e=str(e) + '\n没有下一页了!!!', istraceback=False)
@@ -1966,6 +1965,7 @@ class Driver(object):
             else:
                 elements_list = elements_list[page.listcssselector.item_start:page.listcssselector.item_end]
             for each in elements_list:
+                self.scroll_to_center(ele=each)#把每一个item移动到页面中间
                 item = each
                 if page.listcssselector.item_css_selector:#如果不为空
                     item = self.until_presence_of_element_located_by_css_selector(ele=each,css_selector=page.listcssselector.item_css_selector)
@@ -2252,7 +2252,7 @@ class Driver(object):
             self.driver.close()
             if no_page:
                 self.start_session()
-                if not self.fast_get_page(url='https://www.baidu.com'):
+                if not self.fast_get_page(url='https://www.baidu.com'):#暂时存放页面
                     self.exit_for_failing_to_load_page()
             else:
                 self.driver.switch_to.window(self.driver.window_handles[-1])

@@ -18,10 +18,13 @@ def get_shop_tag(self, _str):
         tag_list.append(i.text())
     return json.dumps(tag_list, ensure_ascii=False)
 
+def get_shop_rate(self, _str):
+    return str(float((int(_str)/10)))
+
 fl_shop1 = Fieldlist(
-    Field(fieldname=FieldName.SHOP_NAME, css_selector='div.hotel-info-ctn > div.hotel-info-main > h2 > a.hotel-name-link'),
     Field(fieldname=FieldName.SHOP_PRICE, css_selector='div.hotel-info-ctn > div.hotel-remark > div.price > p > strong'),
-    Field(fieldname=FieldName.SHOP_RATE, css_selector='div.hotel-info-ctn > div.hotel-remark > div.remark > div > div > span', attr='class', regex=r'[^\d]*'),
+    Field(fieldname=FieldName.SHOP_NAME, css_selector='div.hotel-info-ctn > div.hotel-info-main > h2 > a.hotel-name-link'),
+    Field(fieldname=FieldName.SHOP_RATE, css_selector='div.hotel-info-ctn > div.hotel-remark > div.remark > div > div > span', attr='class', regex=r'[^\d]*', filter_func=get_shop_rate),
     Field(fieldname=FieldName.SHOP_COMMENT_NUM, css_selector='div.hotel-info-ctn > div.hotel-remark > div.remark > div > div > a', regex=r'[^\d]*'),
     Field(fieldname=FieldName.SHOP_TAG, css_selector='div.hotel-info-ctn > div.hotel-info-main > p.hotel-tags', attr='innerHTML', filter_func=get_shop_tag, pause_time=3),
 )
@@ -32,10 +35,10 @@ def get_shop_room_all(self, _str):
     return ''
 
 fl_shop2 = Fieldlist(
-    Field(fieldname=FieldName.SHOP_GRADE, css_selector='#poi-detail > div.container > div.base-info > div.main-detail.clearfix > div.main-detail-right > div.hotel-appraise > div.hotel-scope > span'),
-    Field(fieldname=FieldName.SHOP_PHONE, css_selector='#poi-detail > div.container > div.base-info > div.main-detail.clearfix > div.main-detail-left > div.main-detail-left-top.clearfix > div.hotel-detail-info > div > div.call-info > div > span.call-number'),
-    Field(fieldname=FieldName.SHOP_ADDRESS, css_selector='#poi-detail > div.container > div.base-info > div.main-detail.clearfix > div.main-detail-left > div.main-detail-left-top.clearfix > div.hotel-detail-price > div.hotel-address-box.clearfix > span.hotel-address'),
-    Field(fieldname=FieldName.SHOP_ROOM_RECOMMEND_ALL, css_selector='#deal', attr='innerHTML', filter_func=get_shop_room_all),
+    Field(fieldname=FieldName.SHOP_GRADE, css_selector='#poi-detail > div.container > div.base-info > div.main-detail.clearfix > div.main-detail-right > div.hotel-appraise > div.hotel-scope > span', pause_time=5, is_focus=True),
+    Field(fieldname=FieldName.SHOP_PHONE, css_selector='#poi-detail > div.container > div.base-info > div.main-detail.clearfix > div.main-detail-left > div.main-detail-left-top.clearfix > div.hotel-detail-info > div > div.call-info > div > span.call-number', is_focus=True),
+    Field(fieldname=FieldName.SHOP_ADDRESS, css_selector='#poi-detail > div.container > div.base-info > div.main-detail.clearfix > div.main-detail-left > div.main-detail-left-top.clearfix > div.hotel-detail-price > div.hotel-address-box.clearfix > span.hotel-address', is_focus=True),
+    Field(fieldname=FieldName.SHOP_ROOM_RECOMMEND_ALL, css_selector='#deal', attr='innerHTML', filter_func=get_shop_room_all, is_focus=True),
 )
 
 page_shop_1 = Page(name='大众点评酒店店铺列表页面', fieldlist=fl_shop1, listcssselector=ListCssSelector(list_css_selector='#poi-list > div.content-wrap > div > div.list-wrapper > div.content > ul > li', item_end=1), mongodb=Mongodb(db=TravelDriver.db, collection=TravelDriver.shop_collection))
@@ -44,26 +47,23 @@ page_shop_2 = Page(name='大众点评酒店店铺详情页面', fieldlist=fl_sho
 
 class DianpingHotelSpider(TravelDriver):
 
-    def page_shop_2_func(self):
-        pass
-
     def get_shop_info(self):
         try:
             shop_data_list = self.from_page_get_data_list(page=page_shop_1)
-            self.from_page_add_data_to_data_list(page=page_shop_2, data_list=shop_data_list, pre_page=page_shop_1, page_func=self.page_shop_2_func)
+            self.from_page_add_data_to_data_list(page=page_shop_2, pre_page=page_shop_1, data_list=shop_data_list)
         except Exception as e:
             self.error_log(e=e)
 
     def get_shop_info_list(self):
-        self.fast_get_page('http://www.dianping.com/')
+        self.fast_get_page(url='https://www.baidu.com')
+        time.sleep(2)
+        self.until_scroll_to_center_send_text_by_css_selector(css_selector='#kw', text=self.data_region + self.data_website)
+        self.until_scroll_to_center_send_enter_by_css_selector(css_selector='#kw')
+        self.fast_click_first_item_page_by_partial_link_text(link_text=self.data_website)
         time.sleep(2)
         self.fast_click_first_item_page_by_partial_link_text(link_text='酒店')
-        time.sleep(2)
-        self.until_send_text_by_css_selector(css_selector='#J_h-s-destn-wrap > input', text=self.data_region)
-        time.sleep(2)
-        self.fast_enter_page_by_css_selector(css_selector='#J_h-s-destn-wrap > input')
-        self.vertical_scroll_to()#滚动到页面底部
-        self.until_click_no_next_page_by_partial_link_text(link_text='下一页', func=self.get_shop_info, is_next=False)
+        self.until_click_no_next_page_by_css_selector(css_selector='#poi-list > div.content-wrap > div > div.page > a.next', func=self.get_shop_info, is_next=False)
+        time.sleep(1000)
 
     def run_spider(self):
         try:

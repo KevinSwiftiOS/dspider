@@ -190,7 +190,7 @@ FIELD_NAME_ZH = {
 #offset是每次为了寻找元素偏移的距离
 #try_times是为了寻找元素偏移的次数
 class Field(object):
-    def __init__(self, fieldname='', css_selector='', attr='', regex='', repl='', timeout=2, offset=20, try_times=1, list_css_selector='', item_css_selector='', pause_time=0, filter_func=None, is_focus=True, is_debug=False, is_isolated=False):
+    def __init__(self, fieldname='', css_selector='', attr='', regex='', repl='', timeout=1, list_css_selector='', item_css_selector='', pause_time=0, is_focus=False, is_debug=False, is_isolated=False, filter_func=None):
         """
 
         :param fieldname:字段的名称
@@ -199,15 +199,13 @@ class Field(object):
         :param regex:字段的正则匹配表达式
         :param repl:字段的正则替换表达式
         :param timeout:获取字段的超时时间
-        :param offset:聚焦字段的偏移量(滚动网页是当前字段处于网页中间)
-        :param try_times:获取字段的尝试次数
         :param list_css_selector:列表字段的css选择器
         :param item_css_selector:列表字段里面字段的css选择器
         :param pause_time:暂停的时间
-        :param filter_func:过滤函数
         :param is_focus:是否将元素移到页面中间
         :param is_debug:表示是否输出调试信息
         :param is_isolated:表示爬虫字段的css_selector是否孤立
+        :param filter_func:过滤函数
         """
         self.fieldname = fieldname
         self.fieldtype = (lambda x:FIELD_NAME_TYPE.get(x) if FIELD_NAME_TYPE.get(x) else FieldType.STR)(fieldname)
@@ -216,15 +214,13 @@ class Field(object):
         self.regex = regex
         self.repl = repl
         self.timeout = timeout
-        self.offset = offset
-        self.try_times = try_times
         self.list_css_selector = list_css_selector
         self.item_css_selector = item_css_selector
         self.pause_time = pause_time
-        self.filter_func = filter_func
         self.is_focus = is_focus
         self.is_debug = is_debug
         self.is_isolated = is_isolated
+        self.filter_func = filter_func
 
     def __str__(self):
         if not self.fieldname:
