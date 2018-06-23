@@ -254,12 +254,12 @@ class XiechengHotelSpider(TravelDriver):
             self.error_log(e=e)
 
     def get_shop_info_list(self):
-        self.fast_get_page('http://hotels.ctrip.com/', is_scroll_to_bottom=False)
+        self.fast_get_page('http://hotels.ctrip.com/', is_scroll_to_bottom=False, max_time_to_wait=30,min_time_to_wait=15)
         self.until_scroll_to_center_send_text_by_css_selector(css_selector="#txtCity", text=self.data_region)
         time.sleep(3)
         self.until_scroll_to_center_send_enter_by_css_selector(css_selector="#txtCity")
         time.sleep(2)
-        self.fast_click_same_page_by_css_selector(click_css_selector='#btnSearch')
+        self.fast_click_same_page_by_css_selector(click_css_selector='#btnSearch', min_time_to_wait=15,max_time_to_wait=30)
         self.until_click_no_next_page_by_css_selector(css_selector='#downHerf.c_down', func=self.get_shop_info)
 
     def run_spider(self):

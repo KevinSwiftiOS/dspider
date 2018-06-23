@@ -48,6 +48,10 @@ class FieldName(object):
     SHOP_RANK = 'shop_rank'#店铺排名
     SHOP_TRAFFIC = 'shop_traffic'#位置交通
     SHOP_TAG = 'shop_tag'#店铺标签
+    SHOP_PACKAGE = 'shop_package'#店铺套餐
+    SHOP_FEATURE = 'shop_feature'#店铺特色
+    SHOP_SERVICE = 'shop_service'#店铺服务
+    SHOP_TICKET = 'shop_ticket'#店铺门票
 
     COMMENT_USER_NAME = 'comment_user_name'#评论者的名字
     COMMENT_USER_ID = 'comment_user_id'#评论者的编号
@@ -71,6 +75,7 @@ class FieldName(object):
     COMMENT_ROOM = 'comment_room'#评论的酒店房间
     COMMENT_TYPE = 'comment_type'#评论的类型
     COMMENT_REPLAY = 'comment_replay'#评论回复
+    COMMENT_RATE = 'comment_rate'#评论等级
 
 FIELD_NAME_TYPE = {
     FieldName.NONE : FieldType.NONE,
@@ -104,6 +109,10 @@ FIELD_NAME_TYPE = {
     FieldName.SHOP_RANK : FieldType.STR,
     FieldName.SHOP_TRAFFIC : FieldType.STR,
     FieldName.SHOP_TAG : FieldType.STR,
+    FieldName.SHOP_PACKAGE : FieldType.STR,
+    FieldName.SHOP_FEATURE : FieldType.STR,
+    FieldName.SHOP_SERVICE : FieldType.STR,
+    FieldName.SHOP_TICKET : FieldType.STR,
 
     FieldName.COMMENT_USER_NAME : FieldType.KEY_STR,
     FieldName.COMMENT_TIME : FieldType.KEY_STR,
@@ -127,6 +136,7 @@ FIELD_NAME_TYPE = {
     FieldName.COMMENT_ROOM : FieldType.STR,
     FieldName.COMMENT_TYPE : FieldType.STR,
     FieldName.COMMENT_REPLAY : FieldType.STR,
+    FieldName.COMMENT_RATE : FieldType.STR,
 }
 
 FIELD_NAME_ZH = {
@@ -162,6 +172,10 @@ FIELD_NAME_ZH = {
     FieldName.SHOP_RANK : '店铺排名',
     FieldName.SHOP_TRAFFIC : '位置交通',
     FieldName.SHOP_TAG : '店铺标签',
+    FieldName.SHOP_PACKAGE : '店铺套餐',
+    FieldName.SHOP_FEATURE : '店铺特色',
+    FieldName.SHOP_SERVICE : '店铺服务',
+    FieldName.SHOP_TICKET : '店铺门票',
 
     FieldName.COMMENT_USER_NAME : '用户名称',
     FieldName.COMMENT_USER_ID : '用户编号',
@@ -185,6 +199,7 @@ FIELD_NAME_ZH = {
     FieldName.COMMENT_ROOM : '评论房间',
     FieldName.COMMENT_TYPE : '评论类型',
     FieldName.COMMENT_REPLAY : '评论回复',
+    FieldName.COMMENT_RATE : '评论等级',
 }
 
 #offset是每次为了寻找元素偏移的距离

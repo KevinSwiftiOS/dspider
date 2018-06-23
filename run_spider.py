@@ -13,7 +13,7 @@ if __name__ == '__main__':
 
     elif sys.argv[2]+sys.argv[4] == TravelSpiderName.XIECHENG_SPOT:
         from spider.driver.travel.xiechengspotspider import XiechengSpotSpider
-        spider = XiechengSpotSpider(isheadless=False,ismobile=False,isvirtualdisplay=True,
+        spider = XiechengSpotSpider(isheadless=False,ismobile=False,isvirtualdisplay=False,
                                     spider_id=sys.argv[1],
                                     data_website=sys.argv[2],
                                     data_region=sys.argv[3],

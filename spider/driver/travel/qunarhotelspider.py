@@ -79,7 +79,7 @@ def get_shop_statistics(self, _str):
     return json.dumps(statistics, ensure_ascii=False)
 
 fl_shop2 = Fieldlist(
-    Field(fieldname=FieldName.SHOP_ROOM_RECOMMEND_ALL, css_selector='div.m-room-tools-bd.js-roomtool-rooms.caculate-price', attr='innerHTML', filter_func=get_room_all, offset=6, try_times=10, pause_time=5),
+    Field(fieldname=FieldName.SHOP_ROOM_RECOMMEND_ALL, css_selector='div.m-room-tools-bd.js-roomtool-rooms.caculate-price', attr='innerHTML', filter_func=get_room_all, pause_time=5),
     Field(fieldname=FieldName.SHOP_TRAFFIC, css_selector='#js-neighbor', attr='innerHTML', filter_func=get_shop_traffic, pause_time=1),
     Field(fieldname=FieldName.SHOP_FACILITIES, css_selector='#descContent', attr='innerHTML', filter_func=get_shop_facilities),
     Field(fieldname=FieldName.SHOP_STATISTICS, css_selector='#comment_main > div > div.b_ugcheader > div.b_ugcfilter', attr='innerHTML', filter_func=get_shop_statistics),

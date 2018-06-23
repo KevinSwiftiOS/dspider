@@ -61,11 +61,11 @@ class Driver(object):
         options = webdriver.ChromeOptions()
         if self.ismobile:
             options.add_argument(
-                'user-agent="%s"'%self.mobile_user_agent)
+                'user-agent=%s'%self.mobile_user_agent)
             self.curr_user_agent = self.mobile_user_agent
         else:
             options.add_argument(
-            'user-agent="%s"'%self.desktop_user_agent)
+            'user-agent=%s'%self.desktop_user_agent)
             self.curr_user_agent = self.desktop_user_agent
         options.add_argument('lang=zh_CN.UTF-8')
         if self.isvirtualdisplay:
@@ -1423,10 +1423,11 @@ class Driver(object):
                 self.info_log(data='第%s次刷新!!!'%count)
                 self.driver.refresh()
 
-    def until_click_no_next_page_by_css_selector(self, css_selector:str, timeout=1, pause_time=2, is_next=True, func=None, **kwargs):
+    def until_click_no_next_page_by_css_selector(self, css_selector:str, stop_css_selector='', timeout=1, pause_time=2, is_next=True, func=None, **kwargs):
         """
         根据css样式点击直到没有下一页
         :param css_selector:
+        :param stop_css_selector:
         :param timeout:
         :param pause_time:
         :param is_next:专门用来测试的时候使用,表示是否点击下一页
@@ -1453,6 +1454,12 @@ class Driver(object):
             try:
                 self.until_scroll_to_center_by_css_selector(css_selector=css_selector, timeout=timeout)
                 time.sleep(1)
+                if stop_css_selector:
+                    try:
+                        self.until_presence_of_element_located_by_css_selector(css_selector=stop_css_selector, timeout=timeout)
+                        break
+                    except Exception:
+                        pass
                 self.until_presence_of_element_located_by_css_selector(css_selector=css_selector, timeout=timeout).click()
                 time.sleep(pause_time)#每一次点击完毕,刷新页面需要缓冲时间
             except Exception as e:
@@ -2043,6 +2050,52 @@ class Driver(object):
                 self.close_curr_page()
         return data_list_tmp
 
+    def from_page_add_data_list_to_data_list(self, page:Page, pre_page:Page, data_list=list(), page_func=None, extra_page_func=None, is_close_curr_page=False):
+        """
+        把当前页面的数据列表再次添加到之前的页面的数据列表里面
+        :param pre_page:先前的页面
+        :param page:爬虫页面
+        :param data_list:字典类型数据列表
+        :param page_func:页面上面执行的准备操作
+        :param is_close_curr_window:是否关闭当前窗口
+        :return:
+        """
+        #整合fieldlist
+        fieldlist_merge = Fieldlist()
+        for field in page.fieldlist:
+            fieldlist_merge.append(field)
+        for field in pre_page.fieldlist:
+            fieldlist_merge.append(field)
+        data_list_tmp = []
+        for i in range(len(data_list)):
+            if page.tabsetup.click_css_selector:
+                #注意这里拼接出完整的css selector 是为了防止元素过期
+                if pre_page.listcssselector.item_css_selector:
+                    item_css_selector = '%s:nth-child(%s) > %s'%(pre_page.listcssselector.list_css_selector, i+1, pre_page.listcssselector.item_css_selector)
+                else:
+                    item_css_selector = '%s:nth-child(%s)' % (pre_page.listcssselector.list_css_selector, i+1)
+                ele = self.until_presence_of_element_located_by_css_selector(css_selector=item_css_selector)
+                add_data_list = self.run_click_tab_task(ele=ele, try_times=page.tabsetup.try_times, pause_time=page.tabsetup.pause_time, name=page.name, click_css_selector=page.tabsetup.click_css_selector, page_func=page_func, is_close_curr_window=not extra_page_func, func=self.from_page_get_data_list, page=page)
+            elif page.tabsetup.url_name:
+                add_data_list = self.run_new_tab_task(try_times=page.tabsetup.try_times, pause_time=page.tabsetup.pause_time, name=page.name, url=data_list[i].get(page.tabsetup.url_name), page_func=page_func, is_close_curr_window=not extra_page_func, func=self.from_page_get_data_list, page=page)
+            else:
+                self.error_log(e='不属于两种标签页类型!!!')
+                raise ValueError
+            if add_data_list and data_list[i]:#如果add_data不为空
+                add_data_list = (lambda x:x if x else [])(add_data_list)#防止出错
+                merge_data_list = [self.merge_dict(add_data,data_list[i]) for add_data in add_data_list]
+                if extra_page_func:
+                    extra_page_func(merge_data_list)
+                    if is_close_curr_page:
+                        self.close_curr_page()
+                if page.is_save:
+                    if len(merge_data_list[0][0]) == len(fieldlist_merge):
+                        self.save_data_list_to_mongodb(fieldlist=fieldlist_merge, mongodb=page.mongodb, datalist=merge_data_list)#注意关键字段必定出现在前面一页
+                    else:
+                        self.warning_log(e='field的fieldname的命名可能出现了重复,请检查!!!')
+                data_list_tmp.extend(merge_data_list)
+        return data_list_tmp
+
     def run_spider(self):
         """
         运行爬虫
@@ -2062,7 +2115,7 @@ class Driver(object):
                           'goog:chromeOptions': {'extensions': [], 'args': [self.curr_user_agent, '--headless', 'disable-infobars']}, 'platform': 'ANY',
                           'version': ''})
 
-    def fast_get_page(self, url:str, try_times=15, min_time_to_wait=5, max_time_to_wait=15, is_max=False, is_scroll_to_bottom=True):
+    def fast_get_page(self, url:str, try_times=15, min_time_to_wait=15, max_time_to_wait=30, is_max=False, is_scroll_to_bottom=True):
         """
         打开网页快速加载页面,直到成功加载
         :param url:
@@ -2094,7 +2147,7 @@ class Driver(object):
         self.exit_for_failing_to_load_page()
         return False
 
-    def fast_new_page(self, url:str, try_times=15, min_time_to_wait=5, max_time_to_wait=15, is_scroll_to_bottom=True):
+    def fast_new_page(self, url:str, try_times=15, min_time_to_wait=15, max_time_to_wait=30, is_scroll_to_bottom=True):
         """
         新建标签页码快速加载页面
         :param url:
@@ -2122,7 +2175,7 @@ class Driver(object):
         self.error_log(e='由于网络原因,无法加载页面,直接跳过!!!', istraceback=False)
         return False
 
-    def fast_click_page_by_css_selector(self, click_css_selector:str, ele=None, try_times=15, min_time_to_wait=5, max_time_to_wait=15, is_scroll_to_bottom=True):
+    def fast_click_page_by_css_selector(self, click_css_selector:str, ele=None, try_times=15, min_time_to_wait=15, max_time_to_wait=30, is_scroll_to_bottom=True):
         """
         点击快速加载页面
         :param click_css_selector:
@@ -2152,7 +2205,7 @@ class Driver(object):
         self.error_log(e='由于网络原因,无法加载页面,直接跳过!!!', istraceback=False)
         return False
 
-    def fast_click_same_page_by_css_selector(self, click_css_selector:str, ele=None, try_times=15, min_time_to_wait=5, max_time_to_wait=15, is_scroll_to_bottom=True):
+    def fast_click_same_page_by_css_selector(self, click_css_selector:str, ele=None, try_times=15, min_time_to_wait=15, max_time_to_wait=30, is_scroll_to_bottom=True):
         """
         点击快速加载页面
         :param click_css_selector:
@@ -2183,7 +2236,7 @@ class Driver(object):
             self.driver.close()
             self.driver.switch_to.window(self.driver.window_handles[-1])
 
-    def fast_click_first_item_page_by_partial_link_text(self, link_text:str, ele=None, try_times=15, min_time_to_wait=5, max_time_to_wait=15, is_scroll_to_bottom=True):
+    def fast_click_first_item_page_by_partial_link_text(self, link_text:str, ele=None, try_times=15, min_time_to_wait=15, max_time_to_wait=30, is_scroll_to_bottom=True):
         """
         点击列表第一个元素快速加载页面
         :param link_text:

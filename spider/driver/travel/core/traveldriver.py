@@ -96,7 +96,7 @@ class TravelDriver(Driver):
         else:
             comment_data_list = self.from_page_get_data_list(page=page)
             time_list = [i.get(FieldName.COMMENT_TIME) for i in comment_data_list]
-            time_list.sort(reverse=True)
+            time_list.sort()#取出最旧的数据
             curr_time = (lambda tl:tl[0] if len(tl) >=1 else '')(time_list)#当前最新时间
             self.debug_log(data='当前最新评论时间%s'%curr_time)
             if curr_time < newest_time:
