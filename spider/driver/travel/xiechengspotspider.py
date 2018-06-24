@@ -29,7 +29,7 @@ def get_shop_service(self, _str):
     return json.dumps(service_list, ensure_ascii=False)
 
 def get_shop_ticket(self, _str):
-    with open('/home/wjl/test.txt','w+') as f:
+    with open('/home/mininet/test.txt','w+') as f:
         f.write(_str)
     return ''
 
