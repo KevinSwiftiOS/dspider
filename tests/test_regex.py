@@ -4,8 +4,7 @@ import re,json
 from pyquery import PyQuery
 from urllib.parse import urlparse
 import xmltodict
-
-with open('/home/wjl/test.txt', 'r') as f:
+with open('/home/mininet/test.txt', 'r') as f:
     _str = f.read()
 p = PyQuery(_str)
 p_ticket = p('#J-Ticket')
@@ -40,7 +39,7 @@ for i in p_ticket('table.ticket-table').items():
     text = "%s"%json.dumps(tbody_dict_list,ensure_ascii=False)
     i.replace_with("<ticket class='content'>%s</ticket>"%text)
 from lxml import etree
-root = etree.Element('root')
+root = etree.Element('ticket')
 pointer = root
 h1 = None
 h2 = None
@@ -49,26 +48,22 @@ for i in p_ticket('ticket').items():
     if i.attr('class') == 'head-level-1':
         pointer = root
         pointer = etree.SubElement(pointer, 'h1')
-        pointer.text = '{"%s":'%i.text()
+        pointer.attrib['name'] = '%s'%i.text()
         h1 = pointer
     if i.attr('class') == 'head-level-2':
         pointer = h1
         pointer = etree.SubElement(pointer, 'h2')
-        pointer.text = '{"%s":'%i.text()
+        pointer.attrib['name'] = '%s'%i.text()
         h2 = pointer
     if i.attr('class') == 'head-level-3':
         pointer = h2
         pointer = etree.SubElement(pointer, 'h3')
-        pointer.text = '{"%s":'%i.text().replace('\"','\\\"')
+        pointer.attrib['name'] = '%s'%i.text()
         h3 = pointer
     if i.attr('class') == 'content':
-        tail = ''
-        if pointer.tag == 'h2':
-            tail = '}'
-        elif pointer.tag == 'h3':
-            tail = '}}'
-        pointer = etree.SubElement(pointer, 'h4')
-        pointer.text = "%s%s,"%(i.text(),tail)
+        pointer = etree.SubElement(pointer, 'content')
+        pointer.text = "%s"%i.text()
         pointer = h3
 tickets = str(etree.tostring(root, pretty_print=True, encoding='utf-8'), 'utf-8')
-print(PyQuery(tickets).text().replace('\n',''))
+tickets= json.loads(json.dumps(xmltodict.parse(tickets), ensure_ascii=False))
+print(tickets)
