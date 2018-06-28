@@ -8,7 +8,7 @@ dspider
 - 数据库使用MongoDB(注意：不要设置密码)
 - Python版本3.4以上
 
-[![Demo]]
+https://github.com/mannuan/dspider/blob/master/docs/mp4/spider-cli.mp4
 
 
 Installation
