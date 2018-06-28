@@ -111,7 +111,7 @@ fl_comment1 = Fieldlist(
     Field(fieldname=FieldName.COMMENT_USER_RATE, css_selector='div > div.dper-info > span', attr='class', filter_func=get_rate),
     Field(fieldname=FieldName.COMMENT_RATE, css_selector='div > div.review-rank > span.sml-rank-stars', attr='class', filter_func=get_rate),
     Field(fieldname=FieldName.COMMENT_RATE_TAG, css_selector='div > div.review-rank > span.score', attr='innerHTML', filter_func=get_comment_rate_tag),
-    Field(fieldname=FieldName.COMMENT_CONTENT, css_selector='div > div.review-words.Hide'),
+    Field(fieldname=FieldName.COMMENT_CONTENT, css_selector='div > div.review-words'),
     Field(fieldname=FieldName.COMMENT_PIC_LIST, list_css_selector='div > div.review-pictures > ul', item_css_selector='li > a > img', attr='src', timeout=0),
 )
 
@@ -120,7 +120,16 @@ page_comment_1 = Page(name='大众点评酒店评论列表', fieldlist=fl_commen
 class DianpingHotelSpider(TravelDriver):
 
     def get_shop_comment(self):
-        self.until_click_no_next_page_by_css_selector(css_selector='#review-list > div.review-list-container > div.review-list-main > div.reviews-wrapper > div.bottom-area.clearfix > div > a.NextPage', pause_time=3, func=self.from_page_get_comment_data_list, page=page_comment_1)
+        self.debug_log('get_shop_comment!!!')
+        # try:
+        #     self.until_scroll_to_center_select_by_visible_text_by_css_selector(
+        #         css_selector='#divCtripComment > div.comment_box_bar_new.clearfix > div.bar_right > select.select_sort',
+        #         text='最新点评')
+        # except Exception:
+        #     self.error_log(e='点击最新点评排序出错!!!')
+        self.vertical_scroll_to()
+        self.switch_window_by_index(index=-1)#页面选择
+        self.until_click_no_next_page_by_css_selector(css_selector='#review-list > div.review-list-container > div.review-list-main > div.reviews-wrapper > div.bottom-area.clearfix > div > a.NextPage', pause_time=3, func=self.from_page_get_data_list, page=page_comment_1)
 
     def shop_page_func(self):
         self.until_scroll_to_center_click_by_css_selector(css_selector='#comment > div > div.comment > div.more-comment > a.dp-link')

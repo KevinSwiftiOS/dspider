@@ -226,7 +226,7 @@ class XiechengHotelSpider(TravelDriver):
                 text='入住时间排序')
         except Exception:
             self.error_log(e='点击入住时间排序出错!!!')
-        time.sleep(5)  # 为了缓冲页面排序的变化
+        time.sleep(10)  # 为了缓冲页面排序的变化
         field_shop_name = None
         for field in page_comment_1.fieldlist:
             if field.fieldname == FieldName.SHOP_NAME:

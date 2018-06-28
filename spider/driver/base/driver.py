@@ -31,18 +31,20 @@ class Driver(object):
 
     scroll_to_center_js_script = 'window.scrollBy(arguments[0].getClientRects()[0].x + arguments[0].clientWidth / 2 - window.innerWidth / 2, arguments[0].getClientRects()[0].y + arguments[0].clientHeight / 2 - window.innerHeight / 2)'
 
-    def __init__(self,log_file_name='00000000',ismobile=False,isvirtualdisplay=False,isheadless=False):
+    def __init__(self,log_file_name='00000000',ismobile=False,isvirtualdisplay=False,isheadless=False,isloadimages=False):
         """
 
         :param log_file_name:
         :param ismobile:
         :param isvirtualdisplay:
         :param isheadless:
+        :param isloadimages:
         """
         self.logger = get_logger(log_file_name)
         self.ismobile = ismobile
         self.isvirtualdisplay = isvirtualdisplay
         self.isheadless = isheadless
+        self.isloadimages = isloadimages
         self.driver = self.get_driver()
         self.data_key = {}
 
@@ -53,11 +55,7 @@ class Driver(object):
         """
         self.driver.quit()
 
-    def get_driver(self):
-        """
-
-        :return:
-        """
+    def get_options(self):
         options = webdriver.ChromeOptions()
         if self.ismobile:
             options.add_argument(
@@ -75,8 +73,26 @@ class Driver(object):
         if self.isvirtualdisplay == False and self.isheadless == True:
             self.logger.debug('headless is running')
             options.add_argument('--headless')
+        if not self.isloadimages:
+            self.logger.debug('load images is false')
+            options.add_argument('--load-images=false')#不加载图片
+            # 1允许所有图片；2阻止所有图片；3阻止第三方服务器图片
+            prefs = {
+                'profile.default_content_setting_values': {
+                    'images': 2
+                }
+            }
+            options.add_experimental_option('prefs', prefs)
+        options.add_argument('--disk-cache=true')#允许缓存
         options.add_argument('disable-infobars')#隐藏自动化软件测试的提示
-        driver = webdriver.Chrome(chrome_options=options)
+        return options
+
+    def get_driver(self):
+        """
+
+        :return:
+        """
+        driver = webdriver.Chrome(chrome_options=self.get_options())
         driver.set_page_load_timeout(10)
         return driver
 
@@ -2031,6 +2047,7 @@ class Driver(object):
                     item_css_selector = '%s:nth-child(%s) > %s'%(pre_page.listcssselector.list_css_selector, i+1, pre_page.listcssselector.item_css_selector)
                 else:
                     item_css_selector = '%s:nth-child(%s)' % (pre_page.listcssselector.list_css_selector, i+1)
+                self.debug_log(name='item_css_selector',data=item_css_selector)
                 ele = self.until_presence_of_element_located_by_css_selector(css_selector=item_css_selector)
                 add_data = self.run_click_tab_task(ele=ele, try_times=page.tabsetup.try_times, pause_time=page.tabsetup.pause_time, name=page.name, click_css_selector=page.tabsetup.click_css_selector, page_func=page_func, is_close_curr_window=not extra_page_func, func=self.from_fieldlist_get_data, page=page)
             elif page.tabsetup.url_name:
