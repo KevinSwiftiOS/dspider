@@ -9,7 +9,7 @@ dspider
 - Python版本3.4以上
 - 命令行使用
 - https://github.com/mannuan/dspider/blob/master/docs/mp4/spider-cli.mp4
-- web管理界面
+- web管理界面使用
 - https://github.com/mannuan/dspider/blob/master/docs/mp4/spider-gui.mp4
 
 
