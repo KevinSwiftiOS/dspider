@@ -1,7 +1,7 @@
 dspider
 ========
 
-一个基于Selenium的以Django为爬虫框架的爬虫系统.
+ 一款基于django的以selenium为引擎的爬虫框架。
 
 - 用Python编写
 - Web管理界面包含任务监控、项目管理、结果查看
