@@ -11,7 +11,9 @@ dspider
 - https://github.com/mannuan/dspider/blob/master/docs/mp4/spider-cli.mp4
 - web管理界面使用
 - https://github.com/mannuan/dspider/blob/master/docs/mp4/spider-gui.mp4
-
+<video>
+      <source src="https://github.com/mannuan/dspider/blob/master/docs/mp4/spider-cli.mp4" type="video/mp4">
+    </video>
 
 Installation
 ------------
